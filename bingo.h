@@ -6,6 +6,7 @@
 #include <DataDefs.h>
 #include <PluginManager.h>
 
+#include <array>
 #include <memory> // for unique_ptr
 
 #include "json/json.h"
