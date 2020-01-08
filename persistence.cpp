@@ -2,7 +2,7 @@
 
 #include <modules/Persistence.h>
 
-DFhackCExport command_result plugin_save_data(color_ostream &out)
+DFhackCExport command_result plugin_save_data(color_ostream &)
 {
     auto file(Persistence::writeSaveData("bingo"));
 
@@ -11,7 +11,7 @@ DFhackCExport command_result plugin_save_data(color_ostream &out)
     return CR_OK;
 }
 
-DFhackCExport command_result plugin_load_data(color_ostream &out)
+DFhackCExport command_result plugin_load_data(color_ostream &)
 {
     auto file(Persistence::readSaveData("bingo"));
 
