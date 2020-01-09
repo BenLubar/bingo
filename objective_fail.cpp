@@ -104,9 +104,17 @@ std::string describe_objective<BingoObjective::TIME_LIMIT>(const BingoSquare & s
     std::ostringstream str;
 
     str << "This objective will fail ";
-    str << square.data1 << (square.data1 == 1 ? " year, " : " years, ");
-    str << months << (months == 1 ? " month, and " : " months, and ");
-    str << days << (days == 1 ? " day " : " days ");
+    str << square.data1 << (square.data1 == 1 ? " year" : " years");
+    if (months || days)
+    {
+        str << ", ";
+        str << months << (months == 1 ? " month, and " : " months, and ");
+        str << days << (days == 1 ? " day " : " days ");
+    }
+    else
+    {
+        str << " ";
+    }
     str << "after the first embark.";
 
     str << "\n\n";
