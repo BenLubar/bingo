@@ -2,6 +2,7 @@
 #include "card.h"
 #include "square.h"
 
+#include <ctime>
 #include <random>
 
 #include "df/building_type.h"
@@ -24,7 +25,7 @@ std::unique_ptr<BingoCard> BingoGenerator::generate_card() const
     *card = win_condition_candidates[win_condition];
 
     std::vector<BingoSquare> squares = objective_candidates;
-    std::shuffle(squares.begin(), squares.end(), std::mt19937(seed ? seed : random()));
+    std::shuffle(squares.begin(), squares.end(), std::mt19937(seed ? seed : int(std::time(nullptr))));
 
     // TODO: remove squares that violate generation requirements
 
@@ -138,7 +139,7 @@ void BingoGenerator::check_bounds()
     }
     if (free_space > 25)
     {
-        free_space = 1;
+        free_space = 26;
     }
 }
 
