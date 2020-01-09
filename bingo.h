@@ -78,6 +78,8 @@ public:
     void save(Json::Value &) const;
 };
 
+extern bool & should_update;
+extern bool force_win_check;
 extern std::unique_ptr<BingoCard> active_card;
 
 class weblegends_handler_v1;
@@ -88,6 +90,8 @@ enum class BingoScreenPage
     Default,
     Win,
     Loss,
+    Generator,
+    Configure,
 };
 
-bool show_bingo_screen(Plugin *, BingoScreenPage page = BingoScreenPage::Default);
+bool show_bingo_screen(BingoScreenPage page = BingoScreenPage::Default);

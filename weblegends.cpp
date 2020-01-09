@@ -43,7 +43,7 @@ bool bingo_weblegends_handler(weblegends_handler_v1 & ctx, const std::string & p
         ctx.raw_out() << "\toverflow-y: auto;\n";
         ctx.raw_out() << "}\n";
         ctx.raw_out() << ".bingo-card .possible {\n";
-        ctx.raw_out() << "\tbackground-color: #aaa;\n";
+        ctx.raw_out() << "\tbackground-color: #eee;\n";
         ctx.raw_out() << "\tcolor: #000;\n";
         ctx.raw_out() << "}\n";
         ctx.raw_out() << ".bingo-card .succeeded {\n";
@@ -52,7 +52,7 @@ bool bingo_weblegends_handler(weblegends_handler_v1 & ctx, const std::string & p
         ctx.raw_out() << "}\n";
         ctx.raw_out() << ".bingo-card .failed {\n";
         ctx.raw_out() << "\tbackground-color: #800;\n";
-        ctx.raw_out() << "\tcolor: #aaa;\n";
+        ctx.raw_out() << "\tcolor: #eee;\n";
         ctx.raw_out() << "}\n";
         return true;
     }
@@ -74,6 +74,7 @@ bool bingo_weblegends_handler(weblegends_handler_v1 & ctx, const std::string & p
         return false;
     }
 
+    ctx.raw_out() << "<title>Dwarf Fortress Bingo</title>\n";
     ctx.raw_out() << "<link href=\"/style.css\" rel=\"stylesheet\">\n";
     ctx.raw_out() << "<link href=\"/bingo/style.css\" rel=\"stylesheet\">\n";
     if (!active_card)

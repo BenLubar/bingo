@@ -3,6 +3,7 @@ PROJECT(bingo)
 SET(PROJECT_SRCS
     bingo.cpp
     card.cpp
+    generator.cpp
     lua.cpp
     objective_event.cpp
     objective_fail.cpp
@@ -21,6 +22,7 @@ SET(PROJECT_SRCS
 SET(PROJECT_HDRS
     bingo.h
     card.h
+    generator.h
     square.h
     util.h
     weblegends-plugin.h

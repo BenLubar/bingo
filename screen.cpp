@@ -1,6 +1,13 @@
-#include "bingo.h"
+#include "generator.h"
 
 #include "modules/Screen.h"
+
+enum class BingoField
+{
+    WinCondition,
+    FreeSpace,
+    num_fields,
+};
 
 class BingoScreen : public dfhack_viewscreen
 {
@@ -8,8 +15,37 @@ public:
     BingoScreen(BingoScreenPage page) :
         page(page),
         sel_x(2),
-        sel_y(2)
+        sel_y(2),
+        sel_field(BingoField(0))
     {
+    }
+
+    bool isBoardPage() const
+    {
+        return page == BingoScreenPage::Default ||
+            page == BingoScreenPage::Win ||
+            page == BingoScreenPage::Loss;
+    }
+
+    void onShow() override
+    {
+        if (page == BingoScreenPage::Default && active_card)
+        {
+            // unopened file stream doesn't allow any output.
+            std::ofstream dummy_fout;
+            color_ostream_wrapper dummy_out(dummy_fout);
+            switch (active_card->check(dummy_out))
+            {
+                case BingoState::NONE:
+                    break;
+                case BingoState::SUCCEEDED:
+                    page = BingoScreenPage::Win;
+                    break;
+                case BingoState::FAILED:
+                    page = BingoScreenPage::Loss;
+                    break;
+            }
+        }
     }
 
     void feed(interface_key_set *keys) override
@@ -22,7 +58,7 @@ public:
             return;
         }
 
-        if (active_card)
+        if (isBoardPage() && active_card)
         {
             if (keys->erase(interface_key::CURSOR_LEFT))
             {
@@ -57,14 +93,68 @@ public:
                 }
             }
         }
-        // TODO
+        if (isBoardPage() && !active_card)
+        {
+            if (keys->erase(interface_key::SETUPGAME_NEW))
+            {
+                show_bingo_screen(BingoScreenPage::Generator);
+                return;
+            }
+        }
+
+        if (page == BingoScreenPage::Generator)
+        {
+            if (keys->erase(interface_key::MENU_CONFIRM))
+            {
+                should_update = true;
+                active_card = generator.generate_card();
+                force_win_check = true;
+                Screen::dismiss(this);
+                return;
+            }
+
+            if (keys->erase(interface_key::SETUPGAME_CUSTOMIZE_UNIT))
+            {
+                show_bingo_screen(BingoScreenPage::Configure);
+                return;
+            }
+        }
+
+        if (page == BingoScreenPage::Configure)
+        {
+            if (keys->erase(interface_key::CURSOR_DOWN))
+            {
+                int new_field = int(sel_field) + 1;
+                if (new_field > int(BingoField::num_fields))
+                {
+                    new_field = 0;
+                }
+                sel_field = BingoField(new_field);
+            }
+            if (keys->erase(interface_key::CURSOR_UP))
+            {
+                int new_field = int(sel_field) - 1;
+                if (new_field < 0)
+                {
+                    new_field = int(BingoField::num_fields) - 1;
+                }
+                sel_field = BingoField(new_field);
+            }
+
+            if (keys->erase(interface_key::CURSOR_LEFT))
+            {
+                inc_field(-1);
+            }
+            if (keys->erase(interface_key::CURSOR_RIGHT))
+            {
+                inc_field(1);
+            }
+        }
     }
 
     void logic() override
     {
         dfhack_viewscreen::logic();
-
-        // TODO
     }
 
     void render() override
@@ -88,12 +178,83 @@ public:
             paintString(text, (dim.x - 7) / 2, 0, " OH NO ");
         }
 
-        if (active_card)
+        if (isBoardPage())
         {
-            render_card(*active_card);
+            if (active_card)
+            {
+                render_card(*active_card);
+            }
+            else
+            {
+                Painter greeting(rect2d(df::coord2d(2, 2), dim - df::coord2d(3, 3)));
+                greeting.string("There isn't an active bingo card. Press ");
+                greeting.key(interface_key::SETUPGAME_NEW);
+                greeting.string(" to generate one.");
+            }
         }
 
-        // TODO
+        if (page == BingoScreenPage::Generator)
+        {
+            Painter instructions(rect2d(df::coord2d(2, 2), dim - df::coord2d(3, 3)));
+
+            instructions.string("[");
+            instructions.key(interface_key::MENU_CONFIRM);
+            instructions.string("] Generate a bingo card with the current settings");
+            instructions.newline();
+
+            instructions.string("[");
+            instructions.key(interface_key::SETUPGAME_CUSTOMIZE_UNIT);
+            instructions.string("] Customize bingo card generator");
+            instructions.newline();
+
+            instructions.string("[");
+            instructions.key(interface_key::LEAVESCREEN);
+            instructions.string("] Leave this screen");
+            instructions.newline();
+        }
+
+        if (page == BingoScreenPage::Configure)
+        {
+            Painter form(rect2d(df::coord2d(2, 2), dim - df::coord2d(3, 3)));
+            Pen label(0, COLOR_WHITE, COLOR_BLACK);
+            Pen selected(0, COLOR_BLACK, COLOR_GREY);
+            Pen unselected(0, COLOR_GREY, COLOR_BLACK);
+
+            form.string("Win Condition: ", label);
+            form.string(generator.win_condition_candidates.at(generator.win_condition).summarize(), sel_field == BingoField::WinCondition ? selected : form.cur_pen);
+            form.newline();
+
+            form.string("Free Space: ", label);
+            if (sel_field == BingoField::FreeSpace)
+            {
+                form.string("no", generator.free_space ? unselected : selected);
+                form.advance(1);
+                if (generator.free_space == 25)
+                {
+                    form.string("VERY YES", selected);
+                }
+                else
+                {
+                    form.string("yes", generator.free_space ? selected : unselected);
+                }
+            }
+            else
+            {
+                if (generator.free_space == 25)
+                {
+                    form.string("VERY YES");
+                }
+                else if (generator.free_space)
+                {
+                    form.string("yes");
+                }
+                else
+                {
+                    form.string("no");
+                }
+            }
+            form.newline();
+        }
     }
 
     void render_card(const BingoCard & card)
@@ -229,6 +390,40 @@ public:
             paintString(text, x1 + 2, y, description.substr(0, len));
             description.erase(0, len);
         }
+
+        Painter keys(rect2d(df::coord2d(2, dim.y - 2), df::coord2d(x1, dim.y - 2)));
+        keys.string("move cursor:");
+        keys.key(interface_key::CURSOR_LEFT);
+        keys.key(interface_key::CURSOR_RIGHT);
+        keys.key(interface_key::CURSOR_UP);
+        keys.key(interface_key::CURSOR_DOWN);
+        keys.string(" back:");
+        keys.key(interface_key::LEAVESCREEN);
+    }
+
+    void inc_field(int amount)
+    {
+        switch (sel_field)
+        {
+            case BingoField::WinCondition:
+                generator.win_condition += amount;
+                break;
+            case BingoField::FreeSpace:
+                if (amount < 0)
+                {
+                    generator.free_space = 0;
+                }
+                else
+                {
+                    generator.free_space += amount;
+                }
+                break;
+            case BingoField::num_fields:
+                // should never happen
+                break;
+        }
+
+        generator.check_bounds();
     }
 
     std::string getFocusString() override
@@ -236,11 +431,15 @@ public:
         switch (page)
         {
             case BingoScreenPage::Default:
-                return "bingo";
+                return "bingo/view";
             case BingoScreenPage::Win:
-                return "bingo/win";
+                return "bingo/view/win";
             case BingoScreenPage::Loss:
-                return "bingo/loss";
+                return "bingo/view/loss";
+            case BingoScreenPage::Generator:
+                return "bingo/generator";
+            case BingoScreenPage::Configure:
+                return "bingo/generator/configure";
         }
 
         return "bingo/unknown";
@@ -249,9 +448,11 @@ public:
 private:
     BingoScreenPage page;
     int sel_x, sel_y;
+    BingoField sel_field;
 };
 
-bool show_bingo_screen(Plugin *plugin, BingoScreenPage page)
+DFhackDataExport extern Plugin *plugin_self;
+bool show_bingo_screen(BingoScreenPage page)
 {
-    return Screen::show(std::unique_ptr<df::viewscreen>(new BingoScreen(page)), plugin);
+    return Screen::show(std::unique_ptr<df::viewscreen>(new BingoScreen(page)), plugin_self);
 }

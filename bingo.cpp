@@ -2,6 +2,7 @@
 #include "weblegends-plugin.h"
 
 DFHACK_PLUGIN("bingo");
+DFHACK_PLUGIN_IS_ENABLED(should_update);
 
 command_result bingo_command(color_ostream &, std::vector<std::string> &);
 
@@ -14,7 +15,7 @@ DFhackCExport command_result plugin_init(color_ostream &, std::vector<PluginComm
         DESCRIPTION,
         bingo_command,
         false,
-        "bingo: " DESCRIPTION "\n"
+        DESCRIPTION "\n"
         "bingo show\n"
         "  displays the interactive bingo card view\n"
     ));
@@ -28,7 +29,27 @@ DFhackCExport command_result plugin_shutdown(color_ostream &)
 {
     remove_weblegends_handler("bingo");
 
+    should_update = false;
     active_card = nullptr;
+
+    return CR_OK;
+}
+
+DFhackCExport command_result plugin_enable(color_ostream & out, bool enable)
+{
+    if (enable)
+    {
+        out.printerr("Enabling the bingo plugin does nothing. See [help bingo] for usage information.\n");
+        return CR_OK;
+    }
+
+    if (should_update)
+    {
+        out.printerr("Discarding the current bingo card to disable the plugin!\n");
+
+        should_update = false;
+        active_card = nullptr;
+    }
 
     return CR_OK;
 }
@@ -37,12 +58,12 @@ DFhackCExport command_result plugin_onupdate(color_ostream & out)
 {
     if (!active_card)
     {
+        should_update = false;
         return CR_OK;
     }
 
     bool changed = false;
 
-    extern bool force_win_check;
     if (force_win_check)
     {
         changed = true;
@@ -68,10 +89,10 @@ DFhackCExport command_result plugin_onupdate(color_ostream & out)
                 // nothing to do
                 break;
             case BingoState::SUCCEEDED:
-                show_bingo_screen(plugin_self, BingoScreenPage::Win);
+                show_bingo_screen(BingoScreenPage::Win);
                 break;
             case BingoState::FAILED:
-                show_bingo_screen(plugin_self, BingoScreenPage::Loss);
+                show_bingo_screen(BingoScreenPage::Loss);
                 break;
         }
     }
@@ -81,9 +102,11 @@ DFhackCExport command_result plugin_onupdate(color_ostream & out)
 
 command_result bingo_command(color_ostream & out, std::vector<std::string> & parameters)
 {
+    CoreSuspender suspend;
+
     if (parameters.size() == 1 && parameters.at(0) == "show")
     {
-        if (show_bingo_screen(plugin_self))
+        if (show_bingo_screen())
         {
             return CR_OK;
         }

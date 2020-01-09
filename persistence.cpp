@@ -24,10 +24,12 @@ DFhackCExport command_result plugin_save_data(color_ostream &)
 
 DFhackCExport command_result plugin_load_data(color_ostream & out)
 {
+    should_update = false;
+    active_card = nullptr;
+
     auto file(Persistence::readSaveData("bingo"));
     if (!file.good())
     {
-        active_card = nullptr;
         return CR_OK;
     }
 
@@ -44,7 +46,6 @@ DFhackCExport command_result plugin_load_data(color_ostream & out)
 
     if (value.isNull())
     {
-        active_card = nullptr;
         return CR_OK;
     }
 
@@ -54,6 +55,7 @@ DFhackCExport command_result plugin_load_data(color_ostream & out)
         return CR_FAILURE;
     }
 
+    should_update = true;
     active_card = std::move(card);
     force_win_check = true;
     return CR_OK;
