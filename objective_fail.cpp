@@ -6,6 +6,8 @@
 #include "modules/World.h"
 
 #include "df/building.h"
+#include "df/building_def_furnacest.h"
+#include "df/building_def_workshopst.h"
 #include "df/buildings_other_id.h"
 #include "df/world.h"
 
@@ -187,11 +189,19 @@ bool check_objective<BingoObjective::AVOID_BUILDING>(color_ostream &, BingoSquar
         {
             if (type == building_type::Workshop && subtype == workshop_type::Custom)
             {
-                // TODO
+                auto def = df::building_def_workshopst::find(bld->getCustomType());
+                if (def && square.data["custom"].isString() && def->code != square.data["custom"].asString())
+                {
+                    continue;
+                }
             }
             if (type == building_type::Furnace && subtype == furnace_type::Custom)
             {
-                // TODO
+                auto def = df::building_def_furnacest::find(bld->getCustomType());
+                if (def && square.data["custom"].isString() && def->code != square.data["custom"].asString())
+                {
+                    continue;
+                }
             }
 
             square.state = BingoState::FAILED;

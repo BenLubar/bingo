@@ -2,6 +2,8 @@
 
 #include <sstream>
 
+#include "df/building_def_furnacest.h"
+#include "df/building_def_workshopst.h"
 #include "df/civzone_type.h"
 #include "df/construction_type.h"
 #include "df/furnace_type.h"
@@ -9,6 +11,9 @@
 #include "df/siegeengine_type.h"
 #include "df/trap_type.h"
 #include "df/workshop_type.h"
+#include "df/world.h"
+
+REQUIRE_GLOBAL(world);
 
 void replace_all(std::string & s, const std::string & find, const std::string & replace)
 {
@@ -75,7 +80,18 @@ std::string get_building_name(const BingoSquare & square)
         case building_type::Furnace:
             if (subtype == furnace_type::Custom)
             {
-                // TODO
+                if (square.data["custom"].isString())
+                {
+                    auto code = square.data["custom"].asString();
+                    for (auto & def : world->raws.buildings.furnaces)
+                    {
+                        if (def->code == code)
+                        {
+                            return def->name;
+                        }
+                    }
+                }
+
                 return "unknown custom furnace";
             }
             return ENUM_ATTR_STR(furnace_type, name, df::furnace_type(subtype));
@@ -88,7 +104,18 @@ std::string get_building_name(const BingoSquare & square)
         case building_type::Workshop:
             if (subtype == workshop_type::Custom)
             {
-                // TODO
+                if (square.data["custom"].isString())
+                {
+                    auto code = square.data["custom"].asString();
+                    for (auto & def : world->raws.buildings.workshops)
+                    {
+                        if (def->code == code)
+                        {
+                            return def->name;
+                        }
+                    }
+                }
+
                 return "unknown custom worshop";
             }
             return ENUM_ATTR_STR(workshop_type, name, df::workshop_type(subtype));
