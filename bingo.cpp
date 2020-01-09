@@ -42,6 +42,13 @@ DFhackCExport command_result plugin_onupdate(color_ostream & out)
 
     bool changed = false;
 
+    extern bool force_win_check;
+    if (force_win_check)
+    {
+        changed = true;
+        force_win_check = false;
+    }
+
     for (auto & row : active_card->squares)
     {
         for (auto & square : row)

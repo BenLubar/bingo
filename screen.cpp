@@ -145,8 +145,13 @@ public:
                     failed;
 
                 auto desc = square.summarize();
+                int y2 = 1;
+                if (int(desc.length()) < (dx - 1) * (dy - 1))
+                {
+                    y2 += ((dx - 1) * (dy - 1) - desc.length()) / 2 / (dx - 1);
+                }
                 fillRect(pen, x0 + 1 + x * dx, y0 + 1 + y * dy, x0 - 1 + (x + 1) * dx, y0 - 1 + (y + 1) * dy);
-                for (int y2 = 1; y2 < dy; y2++)
+                for (; y2 < dy; y2++)
                 {
                     auto trim = desc;
                     if (int(trim.length()) > dx - 1)

@@ -4,10 +4,16 @@ SET(PROJECT_SRCS
     bingo.cpp
     card.cpp
     lua.cpp
+    objective_event.cpp
+    objective_fail.cpp
     objective_generic.cpp
+    objective_item.cpp
+    objective_population.cpp
+    objective_survival.cpp
     persistence.cpp
     screen.cpp
     square.cpp
+    util.cpp
     weblegends.cpp
     win_condition_generic.cpp
 )
@@ -16,6 +22,7 @@ SET(PROJECT_HDRS
     bingo.h
     card.h
     square.h
+    util.h
     weblegends-plugin.h
 )
 

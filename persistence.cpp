@@ -4,6 +4,7 @@
 #include "json/json.h"
 
 std::unique_ptr<BingoCard> active_card;
+bool force_win_check = false;
 
 DFhackCExport command_result plugin_save_data(color_ostream &)
 {
@@ -54,6 +55,7 @@ DFhackCExport command_result plugin_load_data(color_ostream & out)
     }
 
     active_card = std::move(card);
+    force_win_check = true;
     return CR_OK;
 }
 

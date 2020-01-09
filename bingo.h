@@ -14,6 +14,8 @@
 using namespace DFHack;
 using namespace df::enums;
 
+DFhackDataExport extern std::vector<std::string>* plugin_globals;
+
 // BingoObjective is a predefined objective for a bingo square.
 enum class BingoObjective;
 
