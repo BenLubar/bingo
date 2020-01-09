@@ -8,12 +8,14 @@ SET(PROJECT_SRCS
     persistence.cpp
     rule.cpp
     rule_generic.cpp
+    weblegends.cpp
 )
 
 SET(PROJECT_HDRS
     bingo.h
     goal.h
     rule.h
+    weblegends-plugin.h
 )
 
 SET_SOURCE_FILES_PROPERTIES(${PROJECT_HDRS} PROPERTIES HEADER_FILE_ONLY TRUE)

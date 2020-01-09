@@ -14,3 +14,10 @@ bool check_rule<BingoRule::LUA_SCRIPT>(color_ostream &, BingoSquare &)
     // TODO
     return false;
 }
+
+template<>
+std::string describe_rule<BingoRule::LUA_SCRIPT>(const BingoSquare &)
+{
+    // TODO
+    return "(lua script)";
+}

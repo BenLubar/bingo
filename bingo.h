@@ -41,6 +41,8 @@ public:
     int data1, data2;
 
     bool check(color_ostream &);
+    std::string describe() const;
+
     bool load(color_ostream &, const Json::Value &);
     void save(Json::Value &) const;
 };
@@ -67,3 +69,6 @@ public:
 };
 
 extern std::unique_ptr<BingoBoard> active_board;
+
+class weblegends_handler_v1;
+bool bingo_weblegends_handler(weblegends_handler_v1 &, const std::string &);

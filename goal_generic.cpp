@@ -73,3 +73,33 @@ BingoState check_goal<BingoGoal::FIVE_IN_A_ROW>(color_ostream & out, const Bingo
 
     return aggregate;
 }
+
+template<>
+BingoState check_goal<BingoGoal::BLACKOUT>(color_ostream & out, const BingoBoard & board)
+{
+    BingoState aggregate = BingoState::SUCCEEDED;
+
+    for (auto & row : board.squares)
+    {
+        for (auto & square : row)
+        {
+            switch (square.state)
+            {
+                case BingoState::NONE:
+                    aggregate = BingoState::NONE;
+                    break;
+                case BingoState::SUCCEEDED:
+                    break;
+                case BingoState::FAILED:
+                    return BingoState::FAILED;
+            }
+        }
+    }
+
+    if (aggregate == BingoState::SUCCEEDED)
+    {
+        out << "BINGO! The entire board was completed!" << std::endl;
+    }
+
+    return aggregate;
+}

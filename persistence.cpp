@@ -77,10 +77,62 @@ void BingoBoard::save(Json::Value & value) const
     value["m"] = meta;
 }
 
-bool BingoBoard::load(color_ostream &, const Json::Value &)
+bool BingoBoard::load(color_ostream & out, const Json::Value & value)
 {
-    // TODO
-    return false;
+    if (!value.isObject())
+    {
+        out.printerr("expected JSON object in bingo file\n");
+        return false;
+    }
+
+    if (!value["v"].isIntegral())
+    {
+        out.printerr("missing version number in bingo file\n");
+        return false;
+    }
+
+    int version = value["v"].asInt();
+    switch (version)
+    {
+        case 0:
+            // current version
+            break;
+        default:
+            out.printerr("unexpected version number %d in bingo file\n", version);
+            return false;
+    }
+
+    if (!value["s"].isArray() || value["s"].size() != 25)
+    {
+        out.printerr("missing squares in saved bingo file\n");
+        return false;
+    }
+
+    if (!value["g"].isIntegral() || !value["d"].isObject() || !value["m"].isObject())
+    {
+        out.printerr("missing goal data in saved bingo file\n");
+        return false;
+    }
+
+    Json::ArrayIndex i = 0;
+    for (auto & row : squares)
+    {
+        for (auto & square : row)
+        {
+            if (!square.load(out, value["s"][i]))
+            {
+                return false;
+            }
+
+            i++;
+        }
+    }
+
+    goal = BingoGoal(value["g"].asInt());
+    data = value["d"];
+    meta = value["m"];
+
+    return true;
 }
 
 void BingoSquare::save(Json::Value & value) const
@@ -90,8 +142,17 @@ void BingoSquare::save(Json::Value & value) const
     value["d"] = data;
 }
 
-bool BingoSquare::load(color_ostream &, const Json::Value &)
+bool BingoSquare::load(color_ostream & out, const Json::Value & value)
 {
-    // TODO
-    return false;
+    if (!value.isObject() || !value["r"].isIntegral() || !value["s"].isIntegral() || !value["d"].isObject())
+    {
+        out.printerr("invalid square in saved bingo file\n");
+        return false;
+    }
+
+    rule = BingoRule(value["r"].asInt());
+    state = BingoState(value["s"].asInt());
+    data = value["d"];
+
+    return true;
 }

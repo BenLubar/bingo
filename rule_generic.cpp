@@ -11,3 +11,9 @@ bool check_rule<BingoRule::FREE_SPACE>(color_ostream &, BingoSquare & square)
     square.state = BingoState::SUCCEEDED;
     return true;
 }
+
+template<>
+std::string describe_rule<BingoRule::FREE_SPACE>(const BingoSquare &)
+{
+    return "FREE SPACE";
+}

@@ -5,7 +5,8 @@
 #define BINGO_GOALS \
     BINGO_GOAL(UNKNOWN_GOAL) \
     BINGO_GOAL(LUA_SCRIPT) \
-    BINGO_GOAL(FIVE_IN_A_ROW)
+    BINGO_GOAL(FIVE_IN_A_ROW) \
+    BINGO_GOAL(BLACKOUT)
 
 enum class BingoGoal
 {

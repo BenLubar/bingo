@@ -1,14 +1,19 @@
 #include "bingo.h"
+#include "weblegends-plugin.h"
 
 DFHACK_PLUGIN("bingo");
 
 DFhackCExport command_result plugin_init(color_ostream &, std::vector<PluginCommand> &)
 {
+    add_weblegends_handler("bingo", &bingo_weblegends_handler, "Bingo");
+
     return CR_OK;
 }
 
 DFhackCExport command_result plugin_shutdown(color_ostream &)
 {
+    remove_weblegends_handler("bingo");
+
     active_board = nullptr;
 
     return CR_OK;
