@@ -30,6 +30,8 @@ enum class BingoState
 class BingoSquare
 {
 public:
+    BingoSquare();
+
     BingoRule rule;
     BingoState state;
 
@@ -41,6 +43,7 @@ public:
     int data1, data2;
 
     bool check(color_ostream &);
+    std::string summarize() const;
     std::string describe() const;
 
     bool load(color_ostream &, const Json::Value &);
@@ -54,6 +57,8 @@ enum class BingoGoal;
 class BingoBoard
 {
 public:
+    BingoBoard();
+
     std::array<std::array<BingoSquare, 5>, 5> squares;
     BingoGoal goal;
 
@@ -64,6 +69,7 @@ public:
     Json::Value meta;
 
     BingoState check(color_ostream &) const;
+    std::string summarize() const;
     std::string describe() const;
 
     bool load(color_ostream &, const Json::Value &);

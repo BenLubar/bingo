@@ -18,4 +18,7 @@ template<BingoRule rule>
 bool check_rule(color_ostream &, BingoSquare &);
 
 template<BingoRule rule>
+std::string summarize_rule(const BingoSquare &);
+
+template<BingoRule rule>
 std::string describe_rule(const BingoSquare &);

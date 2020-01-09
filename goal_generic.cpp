@@ -75,9 +75,15 @@ BingoState check_goal<BingoGoal::FIVE_IN_A_ROW>(color_ostream & out, const Bingo
 }
 
 template<>
+std::string summarize_goal<BingoGoal::FIVE_IN_A_ROW>(const BingoBoard &)
+{
+    return "Five-in-a-Row";
+}
+
+template<>
 std::string describe_goal<BingoGoal::FIVE_IN_A_ROW>(const BingoBoard &)
 {
-    return "Five-in-a-Row (row, column, or diagonal)";
+    return "Five squares in any row or column or either of the two diagonals are required to win.";
 }
 
 template<>
@@ -111,7 +117,13 @@ BingoState check_goal<BingoGoal::BLACKOUT>(color_ostream & out, const BingoBoard
 }
 
 template<>
+std::string summarize_goal<BingoGoal::BLACKOUT>(const BingoBoard &)
+{
+    return "Blackout";
+}
+
+template<>
 std::string describe_goal<BingoGoal::BLACKOUT>(const BingoBoard &)
 {
-    return "Blackout (entire board)";
+    return "All 25 squares are required to win.";
 }

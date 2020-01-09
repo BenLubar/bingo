@@ -2,6 +2,7 @@
 
 #define BINGO_GOAL(x) \
     template<> BingoState check_goal<BingoGoal::x>(color_ostream &, const BingoBoard &); \
+    template<> std::string summarize_goal<BingoGoal::x>(const BingoBoard &); \
     template<> std::string describe_goal<BingoGoal::x>(const BingoBoard &);
 BINGO_GOALS
 #undef BINGO_GOAL
@@ -27,6 +28,20 @@ BingoState check_goal<BingoGoal::UNKNOWN_GOAL>(color_ostream & out, const BingoB
     return BingoState::FAILED;
 }
 
+std::string BingoBoard::summarize() const
+{
+    switch (goal)
+    {
+#define BINGO_GOAL(x) \
+        case BingoGoal::x: \
+            return summarize_goal<BingoGoal::x>(*this);
+BINGO_GOALS
+#undef BINGO_GOAL
+    }
+
+    return summarize_goal<BingoGoal::UNKNOWN_GOAL>(*this);
+}
+
 std::string BingoBoard::describe() const
 {
     switch (goal)
@@ -42,7 +57,21 @@ BINGO_GOALS
 }
 
 template<>
-std::string describe_goal<BingoGoal::UNKNOWN_GOAL>(const BingoBoard &)
+std::string summarize_goal<BingoGoal::UNKNOWN_GOAL>(const BingoBoard &)
 {
     return "ERROR GOAL";
+}
+
+template<>
+std::string describe_goal<BingoGoal::UNKNOWN_GOAL>(const BingoBoard &)
+{
+    return "An error occurred. The goal is invalid.";
+}
+
+BingoBoard::BingoBoard() :
+    squares(),
+    goal(BingoGoal::UNKNOWN_GOAL),
+    data(Json::objectValue),
+    meta(Json::objectValue)
+{
 }

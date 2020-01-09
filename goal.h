@@ -19,4 +19,7 @@ template<BingoGoal goal>
 BingoState check_goal(color_ostream &, const BingoBoard &);
 
 template<BingoGoal goal>
+std::string summarize_goal(const BingoBoard &);
+
+template<BingoGoal goal>
 std::string describe_goal(const BingoBoard &);

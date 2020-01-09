@@ -2,6 +2,7 @@
 
 #define BINGO_RULE(x) \
     template<> bool check_rule<BingoRule::x>(color_ostream &, BingoSquare &); \
+    template<> std::string summarize_rule<BingoRule::x>(const BingoSquare &); \
     template<> std::string describe_rule<BingoRule::x>(const BingoSquare &);
 BINGO_RULES
 #undef BINGO_RULE
@@ -33,6 +34,20 @@ bool check_rule<BingoRule::UNKNOWN_RULE>(color_ostream & out, BingoSquare & squa
     return true;
 }
 
+std::string BingoSquare::summarize() const
+{
+    switch (rule)
+    {
+#define BINGO_RULE(x) \
+        case BingoRule::x: \
+            return summarize_rule<BingoRule::x>(*this);
+BINGO_RULES
+#undef BINGO_RULE
+    }
+
+    return summarize_rule<BingoRule::UNKNOWN_RULE>(*this);
+}
+
 std::string BingoSquare::describe() const
 {
     switch (rule)
@@ -48,7 +63,22 @@ BINGO_RULES
 }
 
 template<>
-std::string describe_rule<BingoRule::UNKNOWN_RULE>(const BingoSquare &)
+std::string summarize_rule<BingoRule::UNKNOWN_RULE>(const BingoSquare &)
 {
     return "ERROR";
+}
+
+template<>
+std::string describe_rule<BingoRule::UNKNOWN_RULE>(const BingoSquare &)
+{
+    return "An error occurred. This square is invalid.";
+}
+
+BingoSquare::BingoSquare() :
+    rule(BingoRule::UNKNOWN_RULE),
+    state(BingoState::NONE),
+    data(Json::objectValue),
+    data1(0),
+    data2(0)
+{
 }

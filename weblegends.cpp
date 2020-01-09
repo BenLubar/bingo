@@ -1,6 +1,42 @@
 #include "bingo.h"
 #include "weblegends-plugin.h"
 
+std::string clean_string(std::string s, bool newlines)
+{
+    size_t i = s.find('&');
+    while (i != std::string::npos)
+    {
+        s.replace(i, 1, "&amp;");
+        i = s.find('&', i + 4);
+    }
+
+    i = s.find('<');
+    while (i != std::string::npos)
+    {
+        s.replace(i, 1, "&lt;");
+        i = s.find('<', i + 3);
+    }
+
+    i = s.find('>');
+    while (i != std::string::npos)
+    {
+        s.replace(i, 1, "&gt;");
+        i = s.find('>', i + 3);
+    }
+
+    if (newlines)
+    {
+        i = s.find('\n');
+        while (i != std::string::npos)
+        {
+            s.replace(i, 1, "<br>");
+            i = s.find('\n', i + 3);
+        }
+    }
+
+    return s;
+}
+
 bool bingo_weblegends_handler(weblegends_handler_v1 & ctx, const std::string & path)
 {
     if (path == "/style.css")
@@ -13,6 +49,8 @@ bool bingo_weblegends_handler(weblegends_handler_v1 & ctx, const std::string & p
         ctx.raw_out() << ".bingo-board td {\n";
         ctx.raw_out() << "\twidth: 150px;\n";
         ctx.raw_out() << "\theight: 150px;\n";
+        ctx.raw_out() << "\tpadding: 10px;\n";
+        ctx.raw_out() << "\ttext-align: center;\n";
         ctx.raw_out() << "\tborder: 1px solid #000;\n";
         ctx.raw_out() << "}\n";
         ctx.raw_out() << ".bingo-board .possible {\n";
@@ -38,6 +76,7 @@ bool bingo_weblegends_handler(weblegends_handler_v1 & ctx, const std::string & p
 
     ctx.headers()["Refresh"] = "5";
 
+    ctx.raw_out() << "<link href=\"/style.css\" rel=\"stylesheet\">\n";
     ctx.raw_out() << "<link href=\"/bingo/style.css\" rel=\"stylesheet\">\n";
     if (!active_board)
     {
@@ -46,8 +85,10 @@ bool bingo_weblegends_handler(weblegends_handler_v1 & ctx, const std::string & p
     }
 
     ctx.raw_out() << "<table class=\"bingo-board\">\n";
-    ctx.raw_out() << "<caption>Goal: ";
-    ctx.raw_out() << active_board->describe();
+    ctx.raw_out() << "<caption><b>";
+    ctx.raw_out() << clean_string(active_board->summarize(), false);
+    ctx.raw_out() << "</b>: ";
+    ctx.raw_out() << clean_string(active_board->describe(), true);
     ctx.raw_out() << "</caption>\n";
     for (auto & row : active_board->squares)
     {
@@ -67,8 +108,10 @@ bool bingo_weblegends_handler(weblegends_handler_v1 & ctx, const std::string & p
                     ctx.raw_out() << "failed";
                     break;
             }
-            ctx.raw_out() << "\">";
-            ctx.raw_out() << square.describe();
+            ctx.raw_out() << "\"><b>";
+            ctx.raw_out() << clean_string(square.summarize(), false);
+            ctx.raw_out() << "</b><br>";
+            ctx.raw_out() << clean_string(square.describe(), true);
             ctx.raw_out() << "</td>\n";
         }
         ctx.raw_out() << "</tr>\n";
