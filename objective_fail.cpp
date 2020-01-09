@@ -75,18 +75,18 @@ std::string summarize_objective<BingoObjective::TIME_LIMIT>(const BingoSquare & 
 
     if (square.data1 || !square.data2)
     {
-        str << square.data1 << "-year ";
+        str << square.data1 << "-Year ";
     }
     if (square.data2)
     {
         int days = square.data2 / 1200;
         if (days > 28 || days <= 0)
         {
-            str << (days / 28) << "-month ";
+            str << (days / 28) << "-Month ";
         }
         if (days % 28)
         {
-            str << (days % 28) << "-day ";
+            str << (days % 28) << "-Day ";
         }
     }
     str << "Limit";
@@ -229,7 +229,7 @@ bool check_objective<BingoObjective::AVOID_BUILDING>(color_ostream &, BingoSquar
 template<>
 std::string summarize_objective<BingoObjective::AVOID_BUILDING>(const BingoSquare & square)
 {
-    return get_building_name(square) + "-free Fortress";
+    return get_building_name(square) + "-Free Fortress";
 }
 
 template<>
