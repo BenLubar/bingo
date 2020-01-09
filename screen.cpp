@@ -22,7 +22,7 @@ public:
             return;
         }
 
-        if (active_board)
+        if (active_card)
         {
             if (keys->erase(interface_key::CURSOR_LEFT))
             {
@@ -88,15 +88,15 @@ public:
             paintString(text, (dim.x - 7) / 2, 0, " OH NO ");
         }
 
-        if (active_board)
+        if (active_card)
         {
-            render_board(*active_board);
+            render_card(*active_card);
         }
 
         // TODO
     }
 
-    void render_board(const BingoBoard & board)
+    void render_card(const BingoCard & card)
     {
         using namespace DFHack::Screen;
 
@@ -139,7 +139,7 @@ public:
         {
             for (int x = 0; x < 5; x++)
             {
-                auto & square = board.squares[y][x];
+                auto & square = card.squares[y][x];
                 Pen pen = square.state == BingoState::NONE ? potential :
                     square.state == BingoState::SUCCEEDED ? succeeded :
                     failed;
@@ -172,7 +172,7 @@ public:
             goal = Pen(0, COLOR_BLACK, COLOR_GREY);
             fillRect(goal, x0, 1, x1, 1);
         }
-        auto goalText = board.summarize();
+        auto goalText = card.summarize();
         if (int(goalText.length()) > x1 - x0)
         {
             goalText.erase(x1 - x0);
@@ -185,13 +185,13 @@ public:
         std::string description;
         if (sel_y >= 0)
         {
-            summary = board.squares[sel_y][sel_x].summarize();
-            description = board.squares[sel_y][sel_x].describe();
+            summary = card.squares[sel_y][sel_x].summarize();
+            description = card.squares[sel_y][sel_x].describe();
         }
         else
         {
-            summary = board.summarize();
-            description = board.describe();
+            summary = card.summarize();
+            description = card.describe();
         }
         if (int(summary.length()) > width)
         {

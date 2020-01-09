@@ -2,20 +2,20 @@ PROJECT(bingo)
 
 SET(PROJECT_SRCS
     bingo.cpp
-    goal.cpp
-    goal_generic.cpp
+    card.cpp
     lua.cpp
+    objective_generic.cpp
     persistence.cpp
-    rule.cpp
-    rule_generic.cpp
     screen.cpp
+    square.cpp
     weblegends.cpp
+    win_condition_generic.cpp
 )
 
 SET(PROJECT_HDRS
     bingo.h
-    goal.h
-    rule.h
+    card.h
+    square.h
     weblegends-plugin.h
 )
 

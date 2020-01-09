@@ -1,43 +1,43 @@
-#include "rule.h"
-#include "goal.h"
+#include "card.h"
+#include "square.h"
 
 template<>
-BingoState check_goal<BingoGoal::LUA_SCRIPT>(color_ostream &, const BingoBoard &)
+BingoState check_win_condition<BingoWinCondition::LUA_SCRIPT>(color_ostream &, const BingoCard &)
 {
     // TODO
     return BingoState::NONE;
 }
 
 template<>
-std::string summarize_goal<BingoGoal::LUA_SCRIPT>(const BingoBoard &)
+std::string summarize_win_condition<BingoWinCondition::LUA_SCRIPT>(const BingoCard &)
 {
     // TODO
     return "(lua script)";
 }
 
 template<>
-std::string describe_goal<BingoGoal::LUA_SCRIPT>(const BingoBoard &)
+std::string describe_win_condition<BingoWinCondition::LUA_SCRIPT>(const BingoCard &)
 {
     // TODO
     return "(lua script)";
 }
 
 template<>
-bool check_rule<BingoRule::LUA_SCRIPT>(color_ostream &, BingoSquare &)
+bool check_objective<BingoObjective::LUA_SCRIPT>(color_ostream &, BingoSquare &)
 {
     // TODO
     return false;
 }
 
 template<>
-std::string summarize_rule<BingoRule::LUA_SCRIPT>(const BingoSquare &)
+std::string summarize_objective<BingoObjective::LUA_SCRIPT>(const BingoSquare &)
 {
     // TODO
     return "(lua script)";
 }
 
 template<>
-std::string describe_rule<BingoRule::LUA_SCRIPT>(const BingoSquare &)
+std::string describe_objective<BingoObjective::LUA_SCRIPT>(const BingoSquare &)
 {
     // TODO
     return "(lua script)";

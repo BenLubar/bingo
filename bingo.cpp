@@ -16,7 +16,7 @@ DFhackCExport command_result plugin_init(color_ostream &, std::vector<PluginComm
         false,
         "bingo: " DESCRIPTION "\n"
         "bingo show\n"
-        "  displays the interactive bingo view\n"
+        "  displays the interactive bingo card view\n"
     ));
 
     add_weblegends_handler("bingo", &bingo_weblegends_handler, "Bingo");
@@ -28,21 +28,21 @@ DFhackCExport command_result plugin_shutdown(color_ostream &)
 {
     remove_weblegends_handler("bingo");
 
-    active_board = nullptr;
+    active_card = nullptr;
 
     return CR_OK;
 }
 
 DFhackCExport command_result plugin_onupdate(color_ostream & out)
 {
-    if (!active_board)
+    if (!active_card)
     {
         return CR_OK;
     }
 
     bool changed = false;
 
-    for (auto & row : active_board->squares)
+    for (auto & row : active_card->squares)
     {
         for (auto & square : row)
         {
@@ -55,7 +55,7 @@ DFhackCExport command_result plugin_onupdate(color_ostream & out)
 
     if (changed)
     {
-        switch (active_board->check(out))
+        switch (active_card->check(out))
         {
             case BingoState::NONE:
                 // nothing to do

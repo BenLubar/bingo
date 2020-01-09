@@ -14,8 +14,8 @@
 using namespace DFHack;
 using namespace df::enums;
 
-// BingoRule is a predefined rule for a bingo square.
-enum class BingoRule;
+// BingoObjective is a predefined objective for a bingo square.
+enum class BingoObjective;
 
 // BingoState is the current status of a bingo square or the entire board.
 // Squares can move from NONE or SUCCEEDED to any value, but cannot leave FAILED state.
@@ -32,10 +32,10 @@ class BingoSquare
 public:
     BingoSquare();
 
-    BingoRule rule;
+    BingoObjective objective;
     BingoState state;
 
-    // Data that modifies the meaning of the bingo square's rule.
+    // Data that modifies the meaning of the bingo square's objective.
     Json::Value data;
 
     // Cached versions of the data1 and data2 keys from the data object, for speed.
@@ -50,19 +50,19 @@ public:
     void save(Json::Value &) const;
 };
 
-// BingoGoal is a predefined bingo board win condition.
-enum class BingoGoal;
+// BingoWinCondition is a predefined bingo board win condition.
+enum class BingoWinCondition;
 
-// BingoBoard is the board used for a Bingo game.
-class BingoBoard
+// BingoCard is the board used for a Bingo game.
+class BingoCard
 {
 public:
-    BingoBoard();
+    BingoCard();
 
     std::array<std::array<BingoSquare, 5>, 5> squares;
-    BingoGoal goal;
+    BingoWinCondition win_condition;
 
-    // Data that modifies the meaning of the bingo board's goal.
+    // Data that modifies the meaning of the bingo board's win_condition.
     Json::Value data;
 
     // Data that describes the board itself.
@@ -76,7 +76,7 @@ public:
     void save(Json::Value &) const;
 };
 
-extern std::unique_ptr<BingoBoard> active_board;
+extern std::unique_ptr<BingoCard> active_card;
 
 class weblegends_handler_v1;
 bool bingo_weblegends_handler(weblegends_handler_v1 &, const std::string &);

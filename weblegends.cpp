@@ -42,27 +42,27 @@ bool bingo_weblegends_handler(weblegends_handler_v1 & ctx, const std::string & p
     if (path == "/style.css")
     {
         ctx.headers()["Content-Type"] = "text/css";
-        ctx.raw_out() << ".bingo-board {\n";
+        ctx.raw_out() << ".bingo-card {\n";
         ctx.raw_out() << "\ttable-layout: fixed;\n";
         ctx.raw_out() << "\tborder-collapse: collapse;\n";
         ctx.raw_out() << "}\n";
-        ctx.raw_out() << ".bingo-board td {\n";
+        ctx.raw_out() << ".bingo-card td {\n";
         ctx.raw_out() << "\twidth: 150px;\n";
         ctx.raw_out() << "\theight: 150px;\n";
         ctx.raw_out() << "\tpadding: 10px;\n";
         ctx.raw_out() << "\ttext-align: center;\n";
         ctx.raw_out() << "\tborder: 1px solid #000;\n";
         ctx.raw_out() << "}\n";
-        ctx.raw_out() << ".bingo-board .possible {\n";
+        ctx.raw_out() << ".bingo-card .possible {\n";
         ctx.raw_out() << "\tbackground-color: #aaa;\n";
         ctx.raw_out() << "\tcolor: #000;\n";
         ctx.raw_out() << "}\n";
-        ctx.raw_out() << ".bingo-board .succeeded {\n";
+        ctx.raw_out() << ".bingo-card .succeeded {\n";
         ctx.raw_out() << "\tbackground-color: #6f6;\n";
         ctx.raw_out() << "\tcolor: #000;\n";
         ctx.raw_out() << "\tfont-weight: bold;\n";
         ctx.raw_out() << "}\n";
-        ctx.raw_out() << ".bingo-board .failed {\n";
+        ctx.raw_out() << ".bingo-card .failed {\n";
         ctx.raw_out() << "\tbackground-color: #800;\n";
         ctx.raw_out() << "\tcolor: #aaa;\n";
         ctx.raw_out() << "}\n";
@@ -78,19 +78,19 @@ bool bingo_weblegends_handler(weblegends_handler_v1 & ctx, const std::string & p
 
     ctx.raw_out() << "<link href=\"/style.css\" rel=\"stylesheet\">\n";
     ctx.raw_out() << "<link href=\"/bingo/style.css\" rel=\"stylesheet\">\n";
-    if (!active_board)
+    if (!active_card)
     {
         ctx.raw_out() << "<i>no bingo currently in progress</i>\n";
         return true;
     }
 
-    ctx.raw_out() << "<table class=\"bingo-board\">\n";
+    ctx.raw_out() << "<table class=\"bingo-card\">\n";
     ctx.raw_out() << "<caption><b>";
-    ctx.raw_out() << clean_string(active_board->summarize(), false);
+    ctx.raw_out() << clean_string(active_card->summarize(), false);
     ctx.raw_out() << "</b>: ";
-    ctx.raw_out() << clean_string(active_board->describe(), true);
+    ctx.raw_out() << clean_string(active_card->describe(), true);
     ctx.raw_out() << "</caption>\n";
-    for (auto & row : active_board->squares)
+    for (auto & row : active_card->squares)
     {
         ctx.raw_out() << "<tr>\n";
         for (auto & square : row)
