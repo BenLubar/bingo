@@ -64,6 +64,8 @@ public:
     Json::Value meta;
 
     BingoState check(color_ostream &) const;
+    std::string describe() const;
+
     bool load(color_ostream &, const Json::Value &);
     void save(Json::Value &) const;
 };

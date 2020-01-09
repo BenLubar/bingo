@@ -9,6 +9,13 @@ BingoState check_goal<BingoGoal::LUA_SCRIPT>(color_ostream &, const BingoBoard &
 }
 
 template<>
+std::string describe_goal<BingoGoal::LUA_SCRIPT>(const BingoBoard &)
+{
+    // TODO
+    return "(lua script)";
+}
+
+template<>
 bool check_rule<BingoRule::LUA_SCRIPT>(color_ostream &, BingoSquare &)
 {
     // TODO

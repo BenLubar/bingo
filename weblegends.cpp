@@ -45,7 +45,10 @@ bool bingo_weblegends_handler(weblegends_handler_v1 & ctx, const std::string & p
         return true;
     }
 
-    ctx.raw_out() << "<table class=\"bingo-board\">";
+    ctx.raw_out() << "<table class=\"bingo-board\">\n";
+    ctx.raw_out() << "<caption>Goal: ";
+    ctx.raw_out() << active_board->describe();
+    ctx.raw_out() << "</caption>\n";
     for (auto & row : active_board->squares)
     {
         ctx.raw_out() << "<tr>\n";
