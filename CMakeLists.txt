@@ -8,6 +8,7 @@ SET(PROJECT_SRCS
     persistence.cpp
     rule.cpp
     rule_generic.cpp
+    screen.cpp
     weblegends.cpp
 )
 

@@ -72,3 +72,10 @@ extern std::unique_ptr<BingoBoard> active_board;
 
 class weblegends_handler_v1;
 bool bingo_weblegends_handler(weblegends_handler_v1 &, const std::string &);
+
+enum class BingoScreenPage
+{
+    Default,
+};
+
+void show_bingo_screen(Plugin *, BingoScreenPage page = BingoScreenPage::Default);
