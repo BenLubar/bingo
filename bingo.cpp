@@ -7,12 +7,16 @@ command_result bingo_command(color_ostream &, std::vector<std::string> &);
 
 DFhackCExport command_result plugin_init(color_ostream &, std::vector<PluginCommand> & commands)
 {
+#define DESCRIPTION "adds objectives and win conditions to Dwarf Fortress"
+
     commands.push_back(PluginCommand(
         "bingo",
-        "", // TODO: short description
+        DESCRIPTION,
         bingo_command,
         false,
-        "" // TODO: long description
+        "bingo: " DESCRIPTION "\n"
+        "bingo show\n"
+        "  displays the interactive bingo view\n"
     ));
 
     add_weblegends_handler("bingo", &bingo_weblegends_handler, "Bingo");
@@ -57,10 +61,10 @@ DFhackCExport command_result plugin_onupdate(color_ostream & out)
                 // nothing to do
                 break;
             case BingoState::SUCCEEDED:
-                // TODO: win notification
+                show_bingo_screen(plugin_self, BingoScreenPage::Win);
                 break;
             case BingoState::FAILED:
-                // TODO: loss notification
+                show_bingo_screen(plugin_self, BingoScreenPage::Loss);
                 break;
         }
     }
@@ -68,12 +72,18 @@ DFhackCExport command_result plugin_onupdate(color_ostream & out)
     return CR_OK;
 }
 
-command_result bingo_command(color_ostream &, std::vector<std::string> & parameters)
+command_result bingo_command(color_ostream & out, std::vector<std::string> & parameters)
 {
     if (parameters.size() == 1 && parameters.at(0) == "show")
     {
-        show_bingo_screen(plugin_self);
-        return CR_OK;
+        if (show_bingo_screen(plugin_self))
+        {
+            return CR_OK;
+        }
+
+        out.printerr("failed to open bingo viewscreen!\n");
+
+        return CR_FAILURE;
     }
 
     return CR_WRONG_USAGE;

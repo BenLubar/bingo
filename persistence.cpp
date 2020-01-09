@@ -154,5 +154,17 @@ bool BingoSquare::load(color_ostream & out, const Json::Value & value)
     state = BingoState(value["s"].asInt());
     data = value["d"];
 
+    data1 = 0;
+    data2 = 0;
+
+    if (data["data1"].isIntegral())
+    {
+        data1 = data["data1"].asInt();
+    }
+    if (data["data2"].isIntegral())
+    {
+        data2 = data["data2"].asInt();
+    }
+
     return true;
 }

@@ -78,6 +78,8 @@ bool bingo_weblegends_handler(weblegends_handler_v1 &, const std::string &);
 enum class BingoScreenPage
 {
     Default,
+    Win,
+    Loss,
 };
 
-void show_bingo_screen(Plugin *, BingoScreenPage page = BingoScreenPage::Default);
+bool show_bingo_screen(Plugin *, BingoScreenPage page = BingoScreenPage::Default);
