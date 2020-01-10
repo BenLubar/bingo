@@ -91,6 +91,7 @@ enum class BingoScreenPage
     Win,
     Loss,
     Generator,
+    GeneratorConfirm,
     Configure,
 };
 

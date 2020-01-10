@@ -24,6 +24,11 @@ std::unique_ptr<BingoCard> BingoGenerator::generate_card() const
 
     *card = win_condition_candidates[win_condition];
 
+    if (seed)
+    {
+        card->meta["seed"] = seed;
+    }
+
     std::vector<BingoSquare> squares = objective_candidates;
     std::shuffle(squares.begin(), squares.end(), std::mt19937(seed ? seed : int(std::time(nullptr))));
 

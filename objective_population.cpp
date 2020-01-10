@@ -94,7 +94,7 @@ template<>
 std::string describe_objective<BingoObjective::POPULATION>(const BingoSquare & square)
 {
     std::ostringstream str;
-    str << "Reach a population of " << square.data1 << " citizens and permanent residents in your fortress. ";
+    str << "Reach a population of " << square.data1 << " citizens and permanent residents in your fortress.\n\n";
     str << "Visitors, animals, and the deceased don't count.";
     return str.str();
 }

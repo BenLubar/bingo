@@ -6,6 +6,7 @@ enum class BingoField
 {
     WinCondition,
     FreeSpace,
+    Seed,
     num_fields,
 };
 
@@ -93,11 +94,11 @@ public:
                 }
             }
         }
-        if (isBoardPage() && !active_card)
+        if (isBoardPage())
         {
             if (keys->erase(interface_key::SETUPGAME_NEW))
             {
-                show_bingo_screen(BingoScreenPage::Generator);
+                show_bingo_screen(active_card ? BingoScreenPage::GeneratorConfirm : BingoScreenPage::Generator);
                 return;
             }
         }
@@ -119,13 +120,49 @@ public:
                 return;
             }
         }
+        if (page == BingoScreenPage::GeneratorConfirm)
+        {
+            if (keys->erase(interface_key::MENU_CONFIRM))
+            {
+                page = BingoScreenPage::Generator;
+                return;
+            }
+        }
 
         if (page == BingoScreenPage::Configure)
         {
+            if (sel_field == BingoField::Seed)
+            {
+                bool changed_seed = false;
+                if (keys->erase(interface_key::STRING_A000))
+                {
+                    generator.seed /= 10;
+                    changed_seed = true;
+                }
+                for (int digit = 0; digit < 10; digit++)
+                {
+                    if (keys->erase(df::interface_key(int(interface_key::STRING_A048) + digit)))
+                    {
+                        if (generator.seed < 1e8)
+                        {
+                            generator.seed *= 10;
+                            generator.seed += digit;
+                        }
+
+                        changed_seed = true;
+                    }
+                }
+
+                if (changed_seed)
+                {
+                    return;
+                }
+            }
+
             if (keys->erase(interface_key::CURSOR_DOWN))
             {
                 int new_field = int(sel_field) + 1;
-                if (new_field > int(BingoField::num_fields))
+                if (new_field >= int(BingoField::num_fields))
                 {
                     new_field = 0;
                 }
@@ -183,13 +220,20 @@ public:
             if (active_card)
             {
                 render_card(*active_card);
+
+                Painter keys(rect2d(df::coord2d(2, dim.y - 2), df::coord2d(dim.x - 3, dim.y - 2)));
+                keys.string("Navigate with cursor keys. Press ");
+                keys.key(interface_key::LEAVESCREEN);
+                keys.string(" to exit. Press ");
+                keys.key(interface_key::SETUPGAME_NEW);
+                keys.string(" to generate a new card.");
             }
             else
             {
                 Painter greeting(rect2d(df::coord2d(2, 2), dim - df::coord2d(3, 3)));
-                greeting.string("There isn't an active bingo card. Press ");
+                greeting.string("There isn't an active bingo card. Press [");
                 greeting.key(interface_key::SETUPGAME_NEW);
-                greeting.string(" to generate one.");
+                greeting.string("] to generate one.");
             }
         }
 
@@ -213,18 +257,43 @@ public:
             instructions.newline();
         }
 
+        if (page == BingoScreenPage::GeneratorConfirm)
+        {
+            Painter instructions(rect2d(df::coord2d(2, 2), dim - df::coord2d(3, 3)));
+
+            instructions.string("Are you sure you want to generate a new bingo card?");
+            instructions.newline();
+            instructions.string("Your current bingo card will be replaced if you generate a new one.");
+            instructions.newline();
+            instructions.newline();
+
+            instructions.string("[");
+            instructions.key(interface_key::MENU_CONFIRM);
+            instructions.string("] Really generate a new bingo card");
+            instructions.newline();
+
+            instructions.string("[");
+            instructions.key(interface_key::LEAVESCREEN);
+            instructions.string("] Leave this screen");
+            instructions.newline();
+        }
+
         if (page == BingoScreenPage::Configure)
         {
+            constexpr int align = 16;
+
             Painter form(rect2d(df::coord2d(2, 2), dim - df::coord2d(3, 3)));
             Pen label(0, COLOR_WHITE, COLOR_BLACK);
             Pen selected(0, COLOR_BLACK, COLOR_GREY);
             Pen unselected(0, COLOR_GREY, COLOR_BLACK);
 
             form.string("Win Condition: ", label);
+            form.seek(align, form.cursorY());
             form.string(generator.win_condition_candidates.at(generator.win_condition).summarize(), sel_field == BingoField::WinCondition ? selected : form.cur_pen);
             form.newline();
 
             form.string("Free Space: ", label);
+            form.seek(align, form.cursorY());
             if (sel_field == BingoField::FreeSpace)
             {
                 form.string("no", generator.free_space ? unselected : selected);
@@ -254,6 +323,35 @@ public:
                 }
             }
             form.newline();
+
+            form.string("Random Seed: ", label);
+            form.seek(align, form.cursorY());
+            auto seed_text = std::to_string(generator.seed);
+            if (sel_field == BingoField::Seed)
+            {
+                if (generator.seed)
+                {
+                    form.string(seed_text, selected);
+                }
+                if (generator.seed < 1e8)
+                {
+                    form.string("_", selected);
+                }
+                for (int i = generator.seed ? seed_text.length() : 0; i < 8; i++)
+                {
+                    form.string(" ", selected);
+                }
+            }
+            else
+            {
+                form.string(generator.seed ? seed_text : "(random)");
+            }
+            form.newline();
+
+            Painter keys(rect2d(df::coord2d(2, dim.y - 2), df::coord2d(dim.x - 3, dim.y - 2)));
+            keys.string("Navigate with cursor keys. Press ");
+            keys.key(interface_key::LEAVESCREEN);
+            keys.string(" to exit.");
         }
     }
 
@@ -264,6 +362,14 @@ public:
         auto dim = getWindowSize();
 
         Pen border('\xDB', COLOR_DARKGREY);
+        if (page == BingoScreenPage::Win)
+        {
+            border = border.color(COLOR_LIGHTGREEN);
+        }
+        else if (page == BingoScreenPage::Loss)
+        {
+            border = border.color(COLOR_LIGHTRED);
+        }
         int x0 = 2;
         int y0 = 2;
         int x1 = dim.x - 15;
@@ -306,6 +412,13 @@ public:
                     failed;
 
                 auto desc = square.summarize();
+                for (size_t i = dx - 1; i < desc.size(); i += dx - 1)
+                {
+                    if (desc.at(i) == ' ')
+                    {
+                        desc.erase(i, 1);
+                    }
+                }
                 int y2 = 1;
                 if (int(desc.length()) < (dx - 1) * (dy - 1))
                 {
@@ -346,6 +459,7 @@ public:
         paintString(goal, x0 + (x1 - x0 - goalText.length()) / 2, 1, goalText);
 
         int width = dim.x - x1 - 4;
+        Pen heading(0, COLOR_WHITE, COLOR_BLACK);
         Pen text(0, COLOR_GREY, COLOR_BLACK);
         std::string summary;
         std::string description;
@@ -363,7 +477,7 @@ public:
         {
             summary.erase(width);
         }
-        paintString(text, x1 + 2, 2, summary);
+        paintString(heading, x1 + 2, 2, summary);
         for (int y = 4; !description.empty() && y < dim.y - 2; y++)
         {
             size_t len;
@@ -390,15 +504,6 @@ public:
             paintString(text, x1 + 2, y, description.substr(0, len));
             description.erase(0, len);
         }
-
-        Painter keys(rect2d(df::coord2d(2, dim.y - 2), df::coord2d(x1, dim.y - 2)));
-        keys.string("move cursor:");
-        keys.key(interface_key::CURSOR_LEFT);
-        keys.key(interface_key::CURSOR_RIGHT);
-        keys.key(interface_key::CURSOR_UP);
-        keys.key(interface_key::CURSOR_DOWN);
-        keys.string(" back:");
-        keys.key(interface_key::LEAVESCREEN);
     }
 
     void inc_field(int amount)
@@ -417,6 +522,9 @@ public:
                 {
                     generator.free_space += amount;
                 }
+                break;
+            case BingoField::Seed:
+                // special case; these keys don't work here
                 break;
             case BingoField::num_fields:
                 // should never happen
@@ -438,6 +546,8 @@ public:
                 return "bingo/view/loss";
             case BingoScreenPage::Generator:
                 return "bingo/generator";
+            case BingoScreenPage::GeneratorConfirm:
+                return "bingo/generator/confirm";
             case BingoScreenPage::Configure:
                 return "bingo/generator/configure";
         }

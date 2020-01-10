@@ -11,6 +11,7 @@ std::string clean_string(std::string s, bool newlines)
     if (newlines)
     {
         replace_all(s, "\n", "<br>");
+        replace_all(s, "<br><br>", "<p>");
     }
 
     return s;
@@ -21,23 +22,27 @@ bool bingo_weblegends_handler(weblegends_handler_v1 & ctx, const std::string & p
     if (path == "/style.css")
     {
         ctx.headers()["Content-Type"] = "text/css";
+        ctx.raw_out() << "* {\n";
+        ctx.raw_out() << "\tbox-sizing: border-box;\n";
+        ctx.raw_out() << "}\n";
         ctx.raw_out() << ".bingo-card {\n";
         ctx.raw_out() << "\ttable-layout: fixed;\n";
         ctx.raw_out() << "\tmargin: 0 auto;\n";
-        ctx.raw_out() << "\t--size: 750px;\n";
-        ctx.raw_out() << "\t--size5: calc(var(--size) / 5);\n";
         ctx.raw_out() << "\tborder-collapse: collapse;\n";
         ctx.raw_out() << "}\n";
         ctx.raw_out() << ".bingo-card td {\n";
-        ctx.raw_out() << "\twidth: var(--size5);\n";
-        ctx.raw_out() << "\theight: var(--size5);\n";
+        ctx.raw_out() << "\twidth: 175px;\n";
+        ctx.raw_out() << "\theight: 175px;\n";
         ctx.raw_out() << "\tborder: 1px solid #000;\n";
         ctx.raw_out() << "\tpadding: 0;\n";
-        ctx.raw_out() << "\tbox-sizing: border-box;\n";
+        ctx.raw_out() << "}\n";
+        ctx.raw_out() << ".bingo-card td:not(:hover) p {\n";
+        ctx.raw_out() << "\tmargin-top: 5px;\n";
+        ctx.raw_out() << "\tborder-top: 1px solid;\n";
+        ctx.raw_out() << "\tfont-size: 0;\n";
         ctx.raw_out() << "}\n";
         ctx.raw_out() << ".bingo-card td div {\n";
-        ctx.raw_out() << "\twidth: var(--size5);\n";
-        ctx.raw_out() << "\tmax-height: var(--size5);\n";
+        ctx.raw_out() << "\tmax-height: 173px;\n";
         ctx.raw_out() << "\tpadding: 10px;\n";
         ctx.raw_out() << "\ttext-align: center;\n";
         ctx.raw_out() << "\toverflow-y: auto;\n";

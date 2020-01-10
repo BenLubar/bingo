@@ -238,7 +238,7 @@ std::string describe_objective<BingoObjective::AVOID_BUILDING>(const BingoSquare
     auto name = get_building_name(square);
 
     std::ostringstream str;
-    str << "Complete other objectives without access to a " << name << "! ";
+    str << "Complete other objectives without access to a " << name << "!\n\n";
     str << "Constructing even a single " << name << " will fail this objective.\n\n";
     str << "Note: For furniture, placing is what fails the objective; the corresponding item can still be built in a workshop. ";
     str << "This objective does not count as a win condition while playing adventure mode.";
