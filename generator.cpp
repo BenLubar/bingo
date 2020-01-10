@@ -125,6 +125,13 @@ void BingoGenerator::reset_candidates()
     square.data1 = int(building_type::Trap);
     square.data2 = int(trap_type::Lever) + 1;
     objective_candidates.push_back(square);
+
+    square.objective = BingoObjective::AVOID_BUILDING;
+    square.data.clear();
+    square.data["data1"] = int(building_type::Bed);
+    square.data1 = int(building_type::Bed);
+    square.data2 = 0;
+    objective_candidates.push_back(square);
 }
 
 void BingoGenerator::check_bounds()
