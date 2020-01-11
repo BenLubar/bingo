@@ -15,7 +15,6 @@ BingoGenerator::BingoGenerator() :
     win_condition_candidates(),
     objective_candidates()
 {
-    reset_candidates();
 }
 
 std::unique_ptr<BingoCard> BingoGenerator::generate_card() const
@@ -69,69 +68,23 @@ std::unique_ptr<BingoCard> BingoGenerator::generate_card() const
     return card;
 }
 
-void BingoGenerator::reset_candidates()
+void BingoGenerator::reset_candidates(color_ostream &)
 {
     win_condition_candidates.clear();
 
-    BingoCard card;
-
-    card.win_condition = BingoWinCondition::FIVE_IN_A_ROW;
-    win_condition_candidates.push_back(card);
-
-    card.win_condition = BingoWinCondition::BLACKOUT;
-    win_condition_candidates.push_back(card);
+    add_win_condition_candidate(BingoWinCondition::FIVE_IN_A_ROW);
+    add_win_condition_candidate(BingoWinCondition::BLACKOUT);
 
     objective_candidates.clear();
 
-    BingoSquare square;
+    add_objective_candidate(BingoObjective::TIME_LIMIT, 2, 0);
+    add_objective_candidate(BingoObjective::POPULATION, 150);
+    add_objective_candidate(BingoObjective::MASS_DANCE, 20);
+    add_objective_candidate(BingoObjective::MOUNTAINHOME);
+    add_objective_candidate(BingoObjective::REACH_HFS);
+    add_objective_candidate(BingoObjective::AVOID_BUILDING, int(building_type::Trap), int(trap_type::Lever) + 1);
+    add_objective_candidate(BingoObjective::AVOID_BUILDING, int(building_type::Bed));
 
-    square.objective = BingoObjective::TIME_LIMIT;
-    square.data.clear();
-    square.data["data1"] = 2;
-    square.data1 = 2;
-    square.data2 = 0;
-    objective_candidates.push_back(square);
-
-    square.objective = BingoObjective::POPULATION;
-    square.data.clear();
-    square.data["data1"] = 150;
-    square.data1 = 150;
-    square.data2 = 0;
-    objective_candidates.push_back(square);
-
-    square.objective = BingoObjective::MASS_DANCE;
-    square.data.clear();
-    square.data["data1"] = 20;
-    square.data1 = 20;
-    square.data2 = 0;
-    objective_candidates.push_back(square);
-
-    square.objective = BingoObjective::MOUNTAINHOME;
-    square.data.clear();
-    square.data1 = 0;
-    square.data2 = 0;
-    objective_candidates.push_back(square);
-
-    square.objective = BingoObjective::REACH_HFS;
-    square.data.clear();
-    square.data1 = 0;
-    square.data2 = 0;
-    objective_candidates.push_back(square);
-
-    square.objective = BingoObjective::AVOID_BUILDING;
-    square.data.clear();
-    square.data["data1"] = int(building_type::Trap);
-    square.data["data2"] = int(trap_type::Lever) + 1;
-    square.data1 = int(building_type::Trap);
-    square.data2 = int(trap_type::Lever) + 1;
-    objective_candidates.push_back(square);
-
-    square.objective = BingoObjective::AVOID_BUILDING;
-    square.data.clear();
-    square.data["data1"] = int(building_type::Bed);
-    square.data1 = int(building_type::Bed);
-    square.data2 = 0;
-    objective_candidates.push_back(square);
 }
 
 void BingoGenerator::check_bounds()
@@ -153,6 +106,54 @@ void BingoGenerator::check_bounds()
     {
         free_space = 26;
     }
+}
+
+void BingoGenerator::add_win_condition_candidate(BingoCard card)
+{
+    win_condition_candidates.push_back(card);
+}
+
+void BingoGenerator::add_win_condition_candidate(BingoWinCondition win_condition)
+{
+    BingoCard card;
+    card.win_condition = win_condition;
+
+    add_win_condition_candidate(card);
+}
+
+void BingoGenerator::add_objective_candidate(BingoSquare square)
+{
+    square.data1 = square.data["data1"].isIntegral() ? square.data["data1"].asInt() : 0;
+    square.data2 = square.data["data2"].isIntegral() ? square.data["data2"].asInt() : 0;
+
+    objective_candidates.push_back(square);
+}
+
+void BingoGenerator::add_objective_candidate(BingoObjective objective)
+{
+    BingoSquare square;
+    square.objective = objective;
+
+    add_objective_candidate(square);
+}
+
+void BingoGenerator::add_objective_candidate(BingoObjective objective, int data1)
+{
+    BingoSquare square;
+    square.objective = objective;
+    square.data["data1"] = data1;
+
+    add_objective_candidate(square);
+}
+
+void BingoGenerator::add_objective_candidate(BingoObjective objective, int data1, int data2)
+{
+    BingoSquare square;
+    square.objective = objective;
+    square.data["data1"] = data1;
+    square.data["data2"] = data2;
+
+    add_objective_candidate(square);
 }
 
 BingoGenerator generator;

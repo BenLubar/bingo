@@ -1,4 +1,5 @@
 #include "bingo.h"
+#include "generator.h"
 #include "weblegends-plugin.h"
 
 DFHACK_PLUGIN("bingo");
@@ -6,7 +7,7 @@ DFHACK_PLUGIN_IS_ENABLED(should_update);
 
 command_result bingo_command(color_ostream &, std::vector<std::string> &);
 
-DFhackCExport command_result plugin_init(color_ostream &, std::vector<PluginCommand> & commands)
+DFhackCExport command_result plugin_init(color_ostream & out, std::vector<PluginCommand> & commands)
 {
 #define DESCRIPTION "adds objectives and win conditions to Dwarf Fortress"
 
@@ -21,6 +22,8 @@ DFhackCExport command_result plugin_init(color_ostream &, std::vector<PluginComm
     ));
 
     add_weblegends_handler("bingo", &bingo_weblegends_handler, "Bingo");
+
+    generator.reset_candidates(out);
 
     return CR_OK;
 }
