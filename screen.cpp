@@ -10,6 +10,47 @@ enum class BingoField
     num_fields,
 };
 
+void write_wrapped(Screen::Painter & p, std::string text, const Screen::Pen & pen)
+{
+    int lines = p.height() - p.cursorY();
+    while (!text.empty() && lines > 0)
+    {
+        int width = p.width() - p.cursorX();
+        size_t len = text.length();
+
+        if (int(len) <= width)
+        {
+            // the rest of the text fits
+        }
+        else if ((len = text.rfind(' ', width)) == std::string::npos)
+        {
+            len = width;
+        }
+        else
+        {
+            // include trailing space
+            len++;
+        }
+
+        size_t newline = text.find('\n');
+        if (newline != std::string::npos && newline < len)
+        {
+            len = newline + 1;
+            text[newline] = ' ';
+        }
+
+        p.string(text.substr(0, len), pen);
+        p.newline();
+        text.erase(0, len);
+        lines--;
+    }
+}
+
+void write_wrapped(Screen::Painter & p, std::string text)
+{
+    write_wrapped(p, text, p.cur_pen);
+}
+
 class BingoScreen : public dfhack_viewscreen
 {
 public:
@@ -460,7 +501,7 @@ public:
 
         int width = dim.x - x1 - 4;
         Pen heading(0, COLOR_WHITE, COLOR_BLACK);
-        Pen text(0, COLOR_GREY, COLOR_BLACK);
+
         std::string summary;
         std::string description;
         if (sel_y >= 0)
@@ -478,32 +519,9 @@ public:
             summary.erase(width);
         }
         paintString(heading, x1 + 2, 2, summary);
-        for (int y = 4; !description.empty() && y < dim.y - 2; y++)
-        {
-            size_t len;
-            if (int(description.length()) < width)
-            {
-                len = description.length();
-            }
-            else if ((len = description.rfind(' ', width)) == std::string::npos)
-            {
-                len = width;
-            }
-            else
-            {
-                len++;
-            }
 
-            size_t newline = description.find('\n');
-            if (newline != std::string::npos && newline < len)
-            {
-                len = newline + 1;
-                description[newline] = ' ';
-            }
-
-            paintString(text, x1 + 2, y, description.substr(0, len));
-            description.erase(0, len);
-        }
+        Painter body(rect2d(df::coord2d(x1 + 2, 4), df::coord2d(dim.x - 2, dim.y - 2)));
+        write_wrapped(body, description);
     }
 
     void inc_field(int amount)
