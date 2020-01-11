@@ -11,9 +11,6 @@
 #include "df/buildings_other_id.h"
 #include "df/world.h"
 
-REQUIRE_GLOBAL(cur_year);
-REQUIRE_GLOBAL(cur_year_tick);
-REQUIRE_GLOBAL(cur_year_tick_advmode);
 REQUIRE_GLOBAL(world);
 
 template<>
@@ -25,47 +22,13 @@ bool check_objective<BingoObjective::TIME_LIMIT>(color_ostream &, BingoSquare & 
         return false;
     }
 
-    int now_year = *cur_year;
-    int now_tick = *cur_year_tick;
-    if (World::isAdventureMode())
-    {
-        now_tick = *cur_year_tick_advmode / 72;
-    }
-
-    int start_year = now_year;
-    int start_tick = now_tick;
-    if (square.data.isMember("start_year"))
-    {
-        start_year = square.data["start_year"].asInt();
-        start_tick = square.data["start_tick"].asInt();
-    }
-    else
-    {
-        square.data["start_year"] = int(now_year);
-        square.data["start_tick"] = int(now_tick);
-    }
-
-    int end_year = start_year + square.data1;
-    int end_tick = start_tick + square.data2;
-    while (end_tick > 12 * 28 * 1200)
-    {
-        end_tick -= 12 * 28 * 1200;
-        end_year++;
-    }
-
-    if (now_year > end_year || (now_year == end_year && now_tick > end_tick))
+    if (has_time_passed(square.data1, square.data2, square.data["start_year"], square.data["start_tick"]))
     {
         square.state = BingoState::FAILED;
         return true;
     }
 
-    if (square.state == BingoState::NONE)
-    {
-        square.state = BingoState::SUCCEEDED;
-        return true;
-    }
-
-    return false;
+    return square.change_state(BingoState::SUCCEEDED);
 }
 
 template<>
@@ -119,13 +82,6 @@ std::string describe_objective<BingoObjective::TIME_LIMIT>(const BingoSquare & s
 
     str << "\n\n";
 
-    int now_year = *cur_year;
-    int now_tick = *cur_year_tick;
-    if (World::isAdventureMode())
-    {
-        now_tick = *cur_year_tick_advmode / 72;
-    }
-
     if (!square.data.isMember("start_year"))
     {
         str << "No embarks have happened yet, so the timer has not yet started.";
@@ -133,32 +89,22 @@ std::string describe_objective<BingoObjective::TIME_LIMIT>(const BingoSquare & s
     else
     {
         int start_year = square.data["start_year"].asInt();
-        int end_year = start_year + square.data1;
         int start_tick = square.data["start_tick"].asInt();
-        int end_tick = start_tick + square.data2;
-        while (end_tick > 12 * 28 * 1200)
-        {
-            end_tick -= 12 * 28 * 1200;
-            end_year++;
-        }
+
+        int end_year, end_tick;
+        bool failed = has_time_passed(square.data1, square.data2, start_year, start_tick, &end_year, &end_tick);
 
         str << "The first embark was on ";
         date(str, start_year, start_tick);
         str << ", so this objective ";
-
-        if (now_year > end_year || (now_year == end_year && now_tick > end_tick))
-        {
-            str << "failed ";
-        }
-        else
-        {
-            str << "will fail ";
-        }
-
+        str << (failed ? "failed " : "will fail ");
         str << "on ";
         date(str, end_year, end_tick);
         str << ".";
     }
+
+    int now_year, now_tick;
+    get_current_time(now_year, now_tick);
 
     str << "\n\nIt is currently ";
     date(str, now_year, now_tick);
@@ -179,13 +125,7 @@ bool check_objective<BingoObjective::AVOID_BUILDING>(color_ostream &, BingoSquar
     if (World::isAdventureMode())
     {
         // objective cannot be completed in adventure mode.
-        if (square.state == BingoState::SUCCEEDED)
-        {
-            square.state = BingoState::NONE;
-            return true;
-        }
-
-        return false;
+        return square.change_state(BingoState::NONE);
     }
 
     auto type = df::building_type(square.data1);
@@ -193,37 +133,14 @@ bool check_objective<BingoObjective::AVOID_BUILDING>(color_ostream &, BingoSquar
 
     for (auto & bld : world->buildings.other[buildings_other_id::IN_PLAY])
     {
-        if (bld->getType() == type && bld->getSubtype() == subtype)
+        if (matches_building(square, bld))
         {
-            if (type == building_type::Workshop && subtype == workshop_type::Custom)
-            {
-                auto def = df::building_def_workshopst::find(bld->getCustomType());
-                if (def && square.data["custom"].isString() && def->code != square.data["custom"].asString())
-                {
-                    continue;
-                }
-            }
-            if (type == building_type::Furnace && subtype == furnace_type::Custom)
-            {
-                auto def = df::building_def_furnacest::find(bld->getCustomType());
-                if (def && square.data["custom"].isString() && def->code != square.data["custom"].asString())
-                {
-                    continue;
-                }
-            }
-
             square.state = BingoState::FAILED;
             return true;
         }
     }
 
-    if (square.state == BingoState::NONE)
-    {
-        square.state = BingoState::SUCCEEDED;
-        return true;
-    }
-
-    return false;
+    return square.change_state(BingoState::SUCCEEDED);
 }
 
 template<>

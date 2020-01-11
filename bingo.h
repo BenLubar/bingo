@@ -36,18 +36,28 @@ class BingoSquare
 public:
     BingoSquare();
 
+    // Objective for this square on the card.
     BingoObjective objective;
-    BingoState state;
 
-    // Data that modifies the meaning of the bingo square's objective.
+    // Current state of this square. FAILED squares are failed forever.
+    BingoState state;
+    // Sets [state] to [new_state]. Returns true if they were not previously equal.
+    bool change_state(BingoState new_state);
+
+    // Data that modifies the meaning of the bingo square's [objective].
     Json::Value data;
 
-    // Cached versions of the data1 and data2 keys from the data object, for speed.
+    // Cached versions of the data1 and data2 keys from the [data] object, for speed.
     // Set to 0 if the keys are non-numeric or absent. Should be treated as read-only.
     int data1, data2;
 
+    // Updates the [state] of this card. Returns true if [state] changed.
+    //
+    // This function may modify [data].
     bool check(color_ostream &);
+    // Returns a short description of this square's objective.
     std::string summarize() const;
+    // Returns a long description of this square's objective.
     std::string describe() const;
 
     bool load(color_ostream &, const Json::Value &);

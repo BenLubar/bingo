@@ -2,6 +2,9 @@
 
 #include <sstream>
 
+#include "modules/World.h"
+
+#include "df/building.h"
 #include "df/building_def_furnacest.h"
 #include "df/building_def_workshopst.h"
 #include "df/civzone_type.h"
@@ -13,6 +16,9 @@
 #include "df/workshop_type.h"
 #include "df/world.h"
 
+REQUIRE_GLOBAL(cur_year);
+REQUIRE_GLOBAL(cur_year_tick);
+REQUIRE_GLOBAL(cur_year_tick_advmode);
 REQUIRE_GLOBAL(world);
 
 void replace_all(std::string & s, const std::string & find, const std::string & replace)
@@ -122,4 +128,76 @@ std::string get_building_name(const BingoSquare & square)
         default:
             return ENUM_ATTR_STR(building_type, name, type);
     }
+}
+
+bool matches_building(const BingoSquare & square, df::building *bld)
+{
+    auto type = df::building_type(square.data1);
+    auto subtype = int16_t(square.data2 - 1);
+
+    if (!bld || bld->getType() != type || bld->getSubtype() != subtype)
+    {
+        return false;
+    }
+
+    if (bld->getCustomType() != -1 && square.data["custom"].isString())
+    {
+        auto def = df::building_def::find(bld->getCustomType());
+        if (!def || def->code != square.data["custom"].asString())
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void get_current_time(int & year, int & tick)
+{
+    year = *cur_year;
+    tick = *cur_year_tick;
+    if (World::isAdventureMode())
+    {
+        tick = *cur_year_tick_advmode / 72;
+    }
+}
+
+bool has_time_passed(int years, int ticks, Json::Value & start_year, Json::Value & start_tick, int *end_year, int *end_tick)
+{
+    if (!start_year.isIntegral())
+    {
+        int now_year, now_tick;
+        get_current_time(now_year, now_tick);
+        start_year = now_year;
+        start_tick = now_tick;
+    }
+
+    return has_time_passed(years, ticks, start_year.asInt(), start_tick.asInt(), end_year, end_tick);
+}
+
+bool has_time_passed(int years, int ticks, int start_year, int start_tick, int *end_year, int *end_tick)
+{
+    int now_year, now_tick;
+    get_current_time(now_year, now_tick);
+
+    int end_year_tmp, end_tick_tmp;
+    if (!end_year)
+    {
+        end_year = &end_year_tmp;
+    }
+    if (!end_tick)
+    {
+        end_tick = &end_tick_tmp;
+    }
+
+    *end_year = start_year + years;
+    *end_tick = start_tick + ticks;
+
+    while (*end_tick >= 12 * 28 * 1200)
+    {
+        *end_tick = *end_tick - 12 * 28 * 1200;
+        *end_year = *end_year + 1;
+    }
+
+    return now_year > *end_year || (now_year == *end_year && now_tick >= *end_tick);
 }

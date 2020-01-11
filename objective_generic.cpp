@@ -3,13 +3,7 @@
 template<>
 bool check_objective<BingoObjective::FREE_SPACE>(color_ostream &, BingoSquare & square)
 {
-    if (square.state == BingoState::SUCCEEDED)
-    {
-        return false;
-    }
-
-    square.state = BingoState::SUCCEEDED;
-    return true;
+    return square.change_state(BingoState::SUCCEEDED);
 }
 
 template<>

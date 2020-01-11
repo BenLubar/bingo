@@ -7,6 +7,17 @@
 BINGO_OBJECTIVES
 #undef BINGO_OBJECTIVE
 
+bool BingoSquare::change_state(BingoState new_state)
+{
+    if (state == new_state)
+    {
+        return false;
+    }
+
+    state = new_state;
+    return true;
+}
+
 bool BingoSquare::check(color_ostream & out)
 {
     switch (objective)
