@@ -17,6 +17,8 @@ using namespace df::enums;
 DFhackDataExport extern std::vector<std::string>* plugin_globals;
 
 // BingoObjective is a predefined objective for a bingo square.
+//
+// (defined in square.h)
 enum class BingoObjective;
 
 // BingoState is the current status of a bingo square or the entire board.
@@ -53,37 +55,45 @@ public:
 };
 
 // BingoWinCondition is a predefined bingo board win condition.
+//
+// (defined in card.h)
 enum class BingoWinCondition;
 
-// BingoCard is the board used for a Bingo game.
+// BingoCard is the card used for a game of Bingo.
 class BingoCard
 {
 public:
     BingoCard();
 
+    // Bingo squares, row-major order.
     std::array<std::array<BingoSquare, 5>, 5> squares;
+
+    // Win condition for this card.
     BingoWinCondition win_condition;
 
-    // Data that modifies the meaning of the bingo board's win_condition.
+    // Data that modifies the meaning of the bingo card's win_condition.
     Json::Value data;
 
-    // Data that describes the board itself.
+    // Data that describes the card itself.
     Json::Value meta;
 
+    // Checks whether the card's win condition has been fulfilled (SUCCEEDED),
+    // the card's win condition is impossible to fulfil (FAILED).
+    // Otherwise, returns NONE.
     BingoState check(color_ostream &) const;
+    // Returns a short description of this card's win condition.
     std::string summarize() const;
+    // Returns a long description of this card's win condition.
     std::string describe() const;
 
     bool load(color_ostream &, const Json::Value &);
     void save(Json::Value &) const;
 };
 
+// Protected by CoreSuspender
 extern bool & should_update;
 extern bool force_win_check;
 extern std::unique_ptr<BingoCard> active_card;
-
-class weblegends_handler_v1;
-bool bingo_weblegends_handler(weblegends_handler_v1 &, const std::string &);
 
 enum class BingoPage
 {
@@ -96,3 +106,6 @@ enum class BingoPage
 };
 
 bool show_bingo_screen(BingoPage page = BingoPage::Default);
+
+class weblegends_handler_v1;
+bool bingo_weblegends_handler(weblegends_handler_v1 &, const std::string &);

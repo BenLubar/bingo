@@ -6,7 +6,8 @@
     BINGO_WIN_CONDITION(UNKNOWN_WIN_CONDITION) \
     BINGO_WIN_CONDITION(LUA_SCRIPT) \
     BINGO_WIN_CONDITION(FIVE_IN_A_ROW) \
-    BINGO_WIN_CONDITION(BLACKOUT)
+    BINGO_WIN_CONDITION(BLACKOUT) \
+    /* declare new win conditions here */
 
 enum class BingoWinCondition
 {
