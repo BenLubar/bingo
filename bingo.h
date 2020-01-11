@@ -85,7 +85,7 @@ extern std::unique_ptr<BingoCard> active_card;
 class weblegends_handler_v1;
 bool bingo_weblegends_handler(weblegends_handler_v1 &, const std::string &);
 
-enum class BingoScreenPage
+enum class BingoPage
 {
     Default,
     Win,
@@ -95,4 +95,4 @@ enum class BingoScreenPage
     Configure,
 };
 
-bool show_bingo_screen(BingoScreenPage page = BingoScreenPage::Default);
+bool show_bingo_screen(BingoPage page = BingoPage::Default);

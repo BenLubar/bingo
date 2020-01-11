@@ -89,10 +89,10 @@ DFhackCExport command_result plugin_onupdate(color_ostream & out)
                 // nothing to do
                 break;
             case BingoState::SUCCEEDED:
-                show_bingo_screen(BingoScreenPage::Win);
+                show_bingo_screen(BingoPage::Win);
                 break;
             case BingoState::FAILED:
-                show_bingo_screen(BingoScreenPage::Loss);
+                show_bingo_screen(BingoPage::Loss);
                 break;
         }
     }
