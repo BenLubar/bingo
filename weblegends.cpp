@@ -65,7 +65,7 @@ bool bingo_weblegends_handler(weblegends_handler_v1 & ctx, const std::string & p
     std::string path1 = path;
     if (path1.find("/?refresh=") == 0)
     {
-        constexpr size_t len = strlen("/?refresh=");
+        const size_t len = strlen("/?refresh=");
         if (path1.find_first_not_of("0123456789", len) == std::string::npos)
         {
             path1.erase(0, len);
