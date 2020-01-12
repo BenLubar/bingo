@@ -34,3 +34,5 @@ bool has_time_passed(int years, int ticks, Json::Value & start_year, Json::Value
 // return true if the current time is more than [years] years and [ticks] ticks after [start_year]
 // and [start_tick]. sets the values of [end_year] and [end_tick] if they are not nullptr.
 bool has_time_passed(int years, int ticks, int start_year, int start_tick, int *end_year = nullptr, int *end_tick = nullptr);
+
+std::string ordinal_suffix(int);

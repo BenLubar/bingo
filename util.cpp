@@ -201,3 +201,24 @@ bool has_time_passed(int years, int ticks, int start_year, int start_tick, int *
 
     return now_year > *end_year || (now_year == *end_year && now_tick >= *end_tick);
 }
+
+std::string ordinal_suffix(int n)
+{
+    n %= 100;
+    if (n > 10 && n < 20)
+    {
+        return "th";
+    }
+
+    switch (n % 10)
+    {
+        case 1:
+            return "st";
+        case 2:
+            return "nd";
+        case 3:
+            return "rd";
+        default:
+            return "th";
+    }
+}
