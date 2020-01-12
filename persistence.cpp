@@ -1,4 +1,5 @@
-#include "bingo.h"
+#include "card.h"
+#include "square.h"
 
 #include "modules/Persistence.h"
 #include "json/json.h"
@@ -79,6 +80,10 @@ void BingoCard::save(Json::Value & value) const
     value["g"] = int(win_condition);
     value["d"] = data;
     value["m"] = meta;
+    if (lua_ref)
+    {
+        save_lua(value);
+    }
 }
 
 bool BingoCard::load(color_ostream & out, const Json::Value & value)
@@ -136,6 +141,11 @@ bool BingoCard::load(color_ostream & out, const Json::Value & value)
     data = value["d"];
     meta = value["m"];
 
+    if (win_condition == BingoWinCondition::LUA_SCRIPT)
+    {
+        return load_lua(out);
+    }
+
     return true;
 }
 
@@ -144,6 +154,10 @@ void BingoSquare::save(Json::Value & value) const
     value["r"] = int(objective);
     value["s"] = int(state);
     value["d"] = data;
+    if (lua_ref)
+    {
+        save_lua(value);
+    }
 }
 
 bool BingoSquare::load(color_ostream & out, const Json::Value & value)
@@ -168,6 +182,11 @@ bool BingoSquare::load(color_ostream & out, const Json::Value & value)
     if (data["data2"].isIntegral())
     {
         data2 = data["data2"].asInt();
+    }
+
+    if (objective == BingoObjective::LUA_SCRIPT)
+    {
+        return load_lua(out);
     }
 
     return true;

@@ -148,9 +148,7 @@ public:
         {
             if (keys->erase(interface_key::MENU_CONFIRM))
             {
-                should_update = true;
-                active_card = generator.generate_card();
-                force_win_check = true;
+                generator.generate_and_activate_card(Core::getInstance().getConsole());
                 Screen::dismiss(this);
                 return;
             }

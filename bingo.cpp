@@ -40,6 +40,8 @@ DFhackCExport command_result plugin_shutdown(color_ostream &)
 
 DFhackCExport command_result plugin_enable(color_ostream & out, bool enable)
 {
+    CoreSuspender suspend;
+
     if (enable)
     {
         out.printerr("Enabling the bingo plugin does nothing. See [help bingo] for usage information.\n");

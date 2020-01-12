@@ -17,6 +17,14 @@ BingoGenerator::BingoGenerator() :
 {
 }
 
+void BingoGenerator::generate_and_activate_card(color_ostream & out)
+{
+    should_update = true;
+    active_card = generate_card();
+    force_win_check = true;
+    reset_candidates(out);
+}
+
 std::unique_ptr<BingoCard> BingoGenerator::generate_card() const
 {
     auto card = std::unique_ptr<BingoCard>(new BingoCard());
@@ -33,10 +41,7 @@ std::unique_ptr<BingoCard> BingoGenerator::generate_card() const
 
     // TODO: remove squares that violate generation requirements
 
-    while (squares.size() < 25)
-    {
-        squares.push_back(BingoSquare());
-    }
+    squares.resize(25);
 
     int i = 0;
     for (auto & row : card->squares)
@@ -68,7 +73,7 @@ std::unique_ptr<BingoCard> BingoGenerator::generate_card() const
     return card;
 }
 
-void BingoGenerator::reset_candidates(color_ostream &)
+void BingoGenerator::reset_candidates(color_ostream & out)
 {
     win_condition_candidates.clear();
 
@@ -85,6 +90,7 @@ void BingoGenerator::reset_candidates(color_ostream &)
     add_objective_candidate(BingoObjective::AVOID_BUILDING, int(building_type::Trap), int(trap_type::Lever) + 1);
     add_objective_candidate(BingoObjective::AVOID_BUILDING, int(building_type::Bed));
 
+    add_lua_candidates(out);
 }
 
 void BingoGenerator::check_bounds()

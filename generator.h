@@ -5,8 +5,10 @@ class BingoGenerator
 public:
     BingoGenerator();
 
+    void generate_and_activate_card(color_ostream &);
     std::unique_ptr<BingoCard> generate_card() const;
     void reset_candidates(color_ostream &);
+    void add_lua_candidates(color_ostream &);
     void check_bounds();
 
     int win_condition;

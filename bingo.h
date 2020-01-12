@@ -30,6 +30,16 @@ enum class BingoState
     FAILED,
 };
 
+class BingoLuaRef
+{
+public:
+    int index;
+    BingoLuaRef(int idx) { index = idx; }
+    ~BingoLuaRef();
+    BingoLuaRef(const BingoLuaRef &) = delete;
+    BingoLuaRef & operator=(const BingoLuaRef &) = delete;
+};
+
 // BingoSquare is one square in the Bingo game.
 class BingoSquare
 {
@@ -51,6 +61,8 @@ public:
     // Set to 0 if the keys are non-numeric or absent. Should be treated as read-only.
     int data1, data2;
 
+    std::shared_ptr<BingoLuaRef> lua_ref;
+
     // Updates the [state] of this card. Returns true if [state] changed.
     //
     // This function may modify [data].
@@ -61,7 +73,9 @@ public:
     std::string describe() const;
 
     bool load(color_ostream &, const Json::Value &);
+    bool load_lua(color_ostream &);
     void save(Json::Value &) const;
+    void save_lua(Json::Value &) const;
 };
 
 // BingoWinCondition is a predefined bingo board win condition.
@@ -87,6 +101,8 @@ public:
     // Data that describes the card itself.
     Json::Value meta;
 
+    std::shared_ptr<BingoLuaRef> lua_ref;
+
     // Checks whether the card's win condition has been fulfilled (SUCCEEDED),
     // the card's win condition is impossible to fulfil (FAILED).
     // Otherwise, returns NONE.
@@ -97,7 +113,9 @@ public:
     std::string describe() const;
 
     bool load(color_ostream &, const Json::Value &);
+    bool load_lua(color_ostream &);
     void save(Json::Value &) const;
+    void save_lua(Json::Value &) const;
 };
 
 // Protected by CoreSuspender
