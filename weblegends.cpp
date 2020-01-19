@@ -63,9 +63,9 @@ bool bingo_weblegends_handler(weblegends_handler_v1 & ctx, const std::string & p
     }
 
     std::string path1 = path;
-    if (path1.find("/?refresh=") == 0)
+    if (path1.find("?refresh=") == 0)
     {
-        const size_t len = strlen("/?refresh=");
+        const size_t len = strlen("?refresh=");
         if (path1.find_first_not_of("0123456789", len) == std::string::npos)
         {
             path1.erase(0, len);
@@ -79,12 +79,17 @@ bool bingo_weblegends_handler(weblegends_handler_v1 & ctx, const std::string & p
         return false;
     }
 
+    ctx.raw_out() << "<!DOCTYPE html>\n";
+    ctx.raw_out() << "<html>\n";
+    ctx.raw_out() << "<head>\n";
     ctx.raw_out() << "<title>Dwarf Fortress Bingo</title>\n";
     ctx.raw_out() << "<link href=\"/style.css\" rel=\"stylesheet\">\n";
     ctx.raw_out() << "<link href=\"/bingo/style.css\" rel=\"stylesheet\">\n";
+    ctx.raw_out() << "</head>\n";
+    ctx.raw_out() << "<body>\n";
     if (!active_card)
     {
-        ctx.raw_out() << "<i>no bingo currently in progress</i>\n";
+        ctx.raw_out() << "<p><i>no bingo currently in progress</i></p>\n";
         return true;
     }
 
@@ -121,6 +126,8 @@ bool bingo_weblegends_handler(weblegends_handler_v1 & ctx, const std::string & p
         ctx.raw_out() << "</tr>\n";
     }
     ctx.raw_out() << "</table>\n";
+    ctx.raw_out() << "</body>\n";
+    ctx.raw_out() << "</html>\n";
 
     return true;
 }
