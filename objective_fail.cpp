@@ -128,9 +128,6 @@ bool check_objective<BingoObjective::AVOID_BUILDING>(color_ostream &, BingoSquar
         return square.change_state(BingoState::NONE);
     }
 
-    auto type = df::building_type(square.data1);
-    auto subtype = int16_t(square.data2 - 1);
-
     for (auto & bld : world->buildings.other[buildings_other_id::IN_PLAY])
     {
         if (matches_building(square, bld))
