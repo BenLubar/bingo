@@ -1,6 +1,7 @@
 #include "square.h"
 #include "util.h"
 
+#include "modules/Units.h"
 #include "modules/World.h"
 
 #include "df/item_constructed.h"
@@ -12,24 +13,77 @@
 REQUIRE_GLOBAL(world);
 
 template<>
-bool check_objective<BingoObjective::ADAMANTINE_EQUIPMENT>(color_ostream &, BingoSquare &)
+bool check_objective<BingoObjective::ADAMANTINE_EQUIPMENT>(color_ostream &, BingoSquare & square)
 {
-    // TODO
-    return false;
+    int32_t count = 0;
+    for (auto u : world->units.all)
+    {
+        if (!Units::isAlive(u) || !Units::isCitizen(u))
+        {
+            continue;
+        }
+
+        bool found = false;
+        for (auto i : u->inventory)
+        {
+            if (found)
+            {
+                break;
+            }
+
+            using inv = df::unit_inventory_item;
+            switch (i->mode)
+            {
+                case inv::Hauled:
+                case inv::WrappedAround:
+                case inv::StuckIn:
+                    // doesn't count as equipment
+                    break;
+                case inv::Weapon:
+                case inv::Worn:
+                case inv::Piercing:
+                case inv::Flask:
+                case inv::InMouth:
+                case inv::Pet:
+                case inv::SewnInto:
+                case inv::Strapped:
+                {
+                    MaterialInfo mat;
+                    if (!i->item || !mat.decode(i->item) || !mat.isInorganic())
+                    {
+                        break;
+                    }
+
+                    if (mat.inorganic->flags.is_set(inorganic_flags::DEEP_SPECIAL))
+                    {
+                        count++;
+                        found = true;
+                    }
+
+                    break;
+                }
+            }
+        }
+    }
+
+    return square.change_state(count >= square.data1 ?
+            BingoState::SUCCEEDED : BingoState::NONE);
 }
 
 template<>
-std::string summarize_objective<BingoObjective::ADAMANTINE_EQUIPMENT>(const BingoSquare &)
+std::string summarize_objective<BingoObjective::ADAMANTINE_EQUIPMENT>(const BingoSquare & square)
 {
-    // TODO
-    return "TODO";
+    std::ostringstream str;
+    str << "Adamantine " << square.data1;
+    return str.str();
 }
 
 template<>
-std::string describe_objective<BingoObjective::ADAMANTINE_EQUIPMENT>(const BingoSquare &)
+std::string describe_objective<BingoObjective::ADAMANTINE_EQUIPMENT>(const BingoSquare & square)
 {
-    // TODO
-    return "TODO";
+    std::ostringstream str;
+    str << "Outfit at least " << square.data1 << " dwarves with adamantine equipment.";
+    return str.str();
 }
 
 template<>

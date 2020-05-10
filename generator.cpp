@@ -91,6 +91,7 @@ void BingoGenerator::reset_candidates(color_ostream & out)
     add_objective_candidate(BingoObjective::AVOID_BUILDING, int(building_type::Trap), int(trap_type::Lever) + 1);
     add_objective_candidate(BingoObjective::AVOID_BUILDING, int(building_type::Bed));
     add_objective_candidate(BingoObjective::COPIES_OF_BOOK, 50);
+    add_objective_candidate(BingoObjective::ADAMANTINE_EQUIPMENT, 5);
 
     add_lua_candidates(out);
 }
