@@ -10,7 +10,6 @@ SET(PROJECT_SRCS
     objective_generic.cpp
     objective_item.cpp
     objective_population.cpp
-    objective_survival.cpp
     persistence.cpp
     screen.cpp
     square.cpp

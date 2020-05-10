@@ -8,48 +8,6 @@
 REQUIRE_GLOBAL(world);
 
 template<>
-bool check_objective<BingoObjective::ADOPTED_ANIMALS>(color_ostream &, BingoSquare &)
-{
-    // TODO
-    return false;
-}
-
-template<>
-std::string summarize_objective<BingoObjective::ADOPTED_ANIMALS>(const BingoSquare &)
-{
-    // TODO
-    return "TODO";
-}
-
-template<>
-std::string describe_objective<BingoObjective::ADOPTED_ANIMALS>(const BingoSquare &)
-{
-    // TODO
-    return "TODO";
-}
-
-template<>
-bool check_objective<BingoObjective::EVERYONE_IN_CAGES>(color_ostream &, BingoSquare &)
-{
-    // TODO
-    return false;
-}
-
-template<>
-std::string summarize_objective<BingoObjective::EVERYONE_IN_CAGES>(const BingoSquare &)
-{
-    // TODO
-    return "TODO";
-}
-
-template<>
-std::string describe_objective<BingoObjective::EVERYONE_IN_CAGES>(const BingoSquare &)
-{
-    // TODO
-    return "TODO";
-}
-
-template<>
 bool check_objective<BingoObjective::POPULATION>(color_ostream &, BingoSquare & square)
 {
     if (square.state == BingoState::SUCCEEDED || !Core::getInstance().isMapLoaded())
