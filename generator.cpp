@@ -27,7 +27,7 @@ void BingoGenerator::generate_and_activate_card(color_ostream & out)
 
 std::unique_ptr<BingoCard> BingoGenerator::generate_card() const
 {
-    auto card = std::unique_ptr<BingoCard>(new BingoCard());
+    auto card = dts::make_unique<BingoCard>();
 
     *card = win_condition_candidates[win_condition];
 
@@ -37,7 +37,8 @@ std::unique_ptr<BingoCard> BingoGenerator::generate_card() const
     }
 
     std::vector<BingoSquare> squares = objective_candidates;
-    std::shuffle(squares.begin(), squares.end(), std::mt19937(seed ? seed : int(std::time(nullptr))));
+    std::mt19937 rng(seed ? seed : int(std::time(nullptr)));
+    std::shuffle(squares.begin(), squares.end(), rng);
 
     // TODO: remove squares that violate generation requirements
 
